@@ -4,435 +4,913 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SpionCamp: Tatort Schulnetz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#2f3437; --ink2:#5b6366; --bg:#f3f1ec; --card:#ffffff; --line:#d6d2c9;
-  --petrol:#1f6f78; --petrol-d:#164f56; --petrol-l:#e3f0f1;
-  --ok:#2e7d4f; --ok-l:#e5f3ea; --err:#b3402f; --err-l:#f9e6e2; --warn:#b7791f; --warn-l:#fdf5e4;
-  --term:#1c2224; --term-ink:#d7e4e2;
+  --night:#0f1416; --night2:#172023; --night3:#1f2b2f; --line-d:#2c3a3e;
+  --paper:#f5efe2; --paper2:#ebe3d1; --ink:#2a2824; --ink2:#6a645a; --line:#d9cfba;
+  --petrol:#1f7a84; --petrol-d:#155961; --petrol-l:#d9ecec; --cyan:#7fd0d6;
+  --amber:#f0b040; --amber-d:#b7791f; --red:#c43a2c; --red-l:#f6dfd9; --ok:#2e7d4f; --ok-l:#dff0e3;
+  --mono:"IBM Plex Mono",Consolas,"Courier New",monospace;
+  --type:"Special Elite","Courier New",monospace;
+  --sans:"IBM Plex Sans","Trebuchet MS",Tahoma,sans-serif;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:"Trebuchet MS",Tahoma,sans-serif;font-size:17px;line-height:1.45}
-header{background:var(--ink);color:#fff;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-header h1{font-family:Georgia,serif;font-weight:normal;font-size:20px;margin:0;flex:1;min-width:180px;cursor:pointer}
-header .pill{background:rgba(255,255,255,.12);border-radius:999px;padding:3px 12px;font-size:14px;white-space:nowrap}
-main{max-width:980px;margin:0 auto;padding:18px 16px 60px}
-h2{font-family:Georgia,serif;font-weight:normal;color:var(--petrol-d);font-size:26px;margin:4px 0 10px}
+body{background:var(--night);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5;
+  background-image:linear-gradient(rgba(127,208,214,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(127,208,214,.035) 1px,transparent 1px),radial-gradient(ellipse at top,#1d2a2e 0%,#0f1416 60%);
+  background-size:32px 32px,32px 32px,100% 100%;background-attachment:fixed;min-height:100vh}
+header{position:sticky;top:0;z-index:10;background:rgba(15,20,22,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line-d);color:#e7eeec;padding:10px 16px}
+.hwrap{max-width:1000px;margin:0 auto;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.logo{font-family:var(--mono);font-weight:600;letter-spacing:.12em;color:var(--amber);font-size:14px;cursor:pointer;white-space:nowrap}
+.logo b{color:#e7eeec;font-family:var(--type);font-weight:normal;letter-spacing:.02em;font-size:20px;margin-left:8px}
+.pips{display:flex;gap:6px;flex:1;min-width:120px}
+.pip{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-d);font:600 11px var(--mono);display:flex;align-items:center;justify-content:center;color:#7f9a97}
+.pip.done{background:var(--petrol);border-color:var(--petrol);color:#fff}
+.pip.part{border-color:var(--amber);color:var(--amber)}
+.chip{font:13px var(--mono);background:rgba(127,208,214,.1);color:var(--cyan);border-radius:999px;padding:4px 12px;white-space:nowrap}
+main{max-width:1000px;margin:0 auto;padding:22px 16px 80px}
+h1,h2{font-family:var(--type);font-weight:normal;margin:0 0 10px;line-height:1.2}
+h2{font-size:30px;color:var(--ink)}
 h3{margin:0 0 8px;font-size:18px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
-.story{border-left:5px solid var(--petrol);background:var(--petrol-l)}
-.clue{border-left:5px solid var(--warn);background:var(--warn-l)}
-.btn{font:inherit;border:0;border-radius:8px;padding:9px 18px;background:var(--petrol);color:#fff;cursor:pointer;text-decoration:none;display:inline-block}
-.btn:hover{background:var(--petrol-d)}
-.btn.sec{background:#fff;color:var(--petrol-d);border:1px solid var(--petrol)}
-.btn.small{padding:5px 12px;font-size:15px}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.tag{font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
+.dark h2,.dark h3{color:#e7eeec}
+.tag{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+.dark .tag{color:var(--amber)}
 .small{font-size:14px;color:var(--ink2)}
-.missions{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.ms{border:1px solid var(--line);border-radius:10px;padding:14px;background:#fff;cursor:pointer;text-align:left;font:inherit;color:inherit}
-.ms:hover{border-color:var(--petrol)}
-.ms.done{border-color:var(--ok);background:var(--ok-l)}
-.ms.locked{opacity:.5;cursor:default}
-.ms .n{font-family:Georgia,serif;font-size:28px;color:var(--petrol)}
-.ms .t{font-weight:bold}
-ol.tasks{padding-left:22px;margin:6px 0}
-ol.tasks li{margin:8px 0}
-.evidence{background:var(--term);color:var(--term-ink);font-family:Consolas,"Courier New",monospace;font-size:16px;border-radius:8px;padding:12px 14px;white-space:pre-wrap;word-break:break-word;margin:8px 0}
-.evidence .sys{color:#7f9a97}
+a{color:var(--petrol-d)}
+/* Akten */
+.file{position:relative;background:var(--paper);border-radius:4px 10px 10px 10px;padding:22px 22px 20px;margin:28px 0 18px;box-shadow:0 10px 30px rgba(0,0,0,.35);border:1px solid #e2d8c2}
+.file::before{content:attr(data-tab);position:absolute;top:-24px;left:-1px;background:var(--paper);border:1px solid #e2d8c2;border-bottom:0;border-radius:8px 8px 0 0;padding:3px 16px 2px;font:600 12px var(--mono);letter-spacing:.12em;color:var(--ink2);text-transform:uppercase}
+.file.story{background:linear-gradient(var(--paper),var(--paper2))}
+.file.story p{font-size:17.5px}
+.dark{background:var(--night2);border:1px solid var(--line-d);color:#cfdcda;border-radius:10px;padding:20px;margin:18px 0;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.stamp{position:absolute;right:18px;top:14px;transform:rotate(6deg);border:4px solid var(--red);color:var(--red);font:bold 18px var(--mono);letter-spacing:.12em;padding:4px 12px;border-radius:6px;opacity:.85;pointer-events:none}
+.stamp.ok{border-color:var(--ok);color:var(--ok)}
+.evidence{position:relative;background:#0b1012;color:#b9f0c4;font:15.5px/1.55 var(--mono);border-radius:8px;padding:14px 16px;white-space:pre-wrap;word-break:break-word;margin:12px 0 4px;border:1px solid #233;box-shadow:inset 0 0 30px rgba(0,0,0,.6);overflow:hidden}
+.evidence::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none}
+.evidence .sys{color:#6f8f8a}
+.evidence .hot{color:var(--amber);font-weight:600}
+/* Schritte */
+.step{background:#fffdf8;border:1px solid var(--line);border-radius:10px;padding:18px;margin:14px 0;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.step.locked{background:rgba(255,253,248,.08);border:1px dashed var(--line-d);color:#7f9a97;box-shadow:none}
+.step.solved{border-color:var(--ok)}
+.shead{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.snum{flex:none;width:34px;height:34px;border-radius:50%;background:var(--petrol);color:#fff;font:600 15px var(--mono);display:flex;align-items:center;justify-content:center}
+.step.solved .snum{background:var(--ok)}
+.step.locked .snum{background:var(--night3);color:#7f9a97}
+.stitle{font-weight:600;font-size:18px;flex:1}
+.btn{font:600 15px var(--sans);border:0;border-radius:8px;padding:9px 18px;background:var(--petrol);color:#fff;cursor:pointer;text-decoration:none;display:inline-block;letter-spacing:.02em}
+.btn:hover{background:var(--petrol-d)}
+.btn.amber{background:var(--amber);color:#2a2008}
+.btn.amber:hover{background:#ffc45a}
+.btn.ghost{background:transparent;color:var(--petrol-d);border:1px solid var(--petrol)}
+.dark .btn.ghost,header .btn.ghost{color:var(--cyan);border-color:var(--cyan)}
+.btn.small{padding:5px 12px;font-size:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 input[type=text],select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
-input[type=text]{min-width:0;flex:1}
-textarea{width:100%;font-family:Consolas,"Courier New",monospace;font-size:15px}
+input[type=text]{min-width:0}
+.grow{flex:1}
+textarea{width:100%;font-family:var(--mono);font-size:14px}
 .fb{border-radius:8px;padding:10px 14px;margin-top:10px}
 .fb.ok{background:var(--ok-l);border:1px solid var(--ok)}
-.fb.err{background:var(--err-l);border:1px solid var(--err)}
-details{margin:8px 0}
-details summary{cursor:pointer;color:var(--petrol-d)}
-details .inner{padding:8px 12px;border-left:3px solid var(--petrol-l);margin-top:6px}
-code,.mono{font-family:Consolas,"Courier New",monospace;font-size:.92em}
-pre{background:#f6f5f1;border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font-size:14px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media (max-width:760px){.grid2{grid-template-columns:1fr}}
-.bars{display:flex;align-items:flex-end;gap:2px;height:160px;border-bottom:1px solid var(--ink2);margin-top:10px}
-.bars div{flex:1;background:var(--petrol);position:relative;min-width:6px}
-.bars div.max{background:var(--warn)}
-.blab{display:flex;gap:2px;font-family:Consolas,monospace;font-size:12px}
-.blab span{flex:1;text-align:center;min-width:6px}
-.scroll{overflow-x:auto}
-table.vq{border-collapse:collapse;font-family:Consolas,"Courier New",monospace;font-size:12px}
-table.vq td,table.vq th{border:1px solid #e5e2da;width:20px;height:20px;text-align:center;padding:0}
-table.vq th{background:var(--petrol-l)}
-table.vq td.hl{background:#ffe9b8}
-.swatch{width:64px;height:64px;border-radius:50%;border:2px solid rgba(0,0,0,.2);display:inline-block}
-.swrow{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;text-align:center;font-size:14px}
-.swrow > div{width:110px}
-.pal{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
-.pal button{width:30px;height:30px;border-radius:50%;border:2px solid #fff;outline:1px solid var(--line);cursor:pointer}
-.pal button.sel{outline:3px solid var(--ink)}
-.mail{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fff;margin:8px 0}
-.mail .hd{font-size:14px;color:var(--ink2);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:6px}
-.certbox{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fafaf7;font-size:14px}
-.certbox table{border-collapse:collapse;width:100%}
-.certbox td{padding:3px 6px;vertical-align:top;border-bottom:1px solid #eee}
-.certbox td:first-child{color:var(--ink2);width:42%}
+.fb.err{background:var(--red-l);border:1px solid var(--red)}
+.fb.info{background:var(--petrol-l);border:1px solid var(--petrol)}
 .opt{display:block;width:100%;text-align:left;font:inherit;background:#fff;border:1px solid var(--line);border-radius:8px;padding:9px 12px;margin:6px 0;cursor:pointer;color:var(--ink)}
 .opt:hover{border-color:var(--petrol)}
 .opt.good{border-color:var(--ok);background:var(--ok-l)}
-.opt.bad{border-color:var(--err);background:var(--err-l)}
-.step{display:flex;gap:10px;align-items:center}
-.step .num{font-family:Georgia,serif;color:var(--petrol);width:26px;flex:none;font-size:20px}
+.opt.bad{border-color:var(--red);background:var(--red-l)}
+.opt .why{display:block;font-size:14px;color:var(--ink2);margin-top:3px}
+details.hint{margin:8px 0;border:1px solid #ecd9a8;background:#fff8e6;border-radius:8px;padding:6px 12px}
+details.hint summary{cursor:pointer;color:var(--amber-d);font-weight:600}
+details.hint[open] summary{margin-bottom:6px}
+code,.mono{font-family:var(--mono);font-size:.92em}
+pre{background:#f6f3ec;border:1px solid var(--line);border-radius:8px;padding:10px;overflow-x:auto;font:14px/1.6 var(--mono)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
 .shake{animation:shake .35s}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.cert{text-align:center}
-.cert .big{font-family:Georgia,serif;font-size:40px;letter-spacing:.2em;color:var(--petrol-d)}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s ease-out}
+/* Startseite */
+.hero{position:relative;padding:28px 22px}
+.hero h1{font-size:46px;color:#f2efe7}
+.hero p{color:#cfdcda;max-width:640px}
+.missions{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px 22px;margin-top:34px}
+.mcard{position:relative;text-align:left;font:inherit;color:var(--ink);cursor:pointer;background:var(--paper);border:1px solid #e2d8c2;border-radius:4px 10px 10px 10px;padding:18px 18px 16px;box-shadow:0 8px 22px rgba(0,0,0,.35);transition:transform .15s}
+.mcard:hover{transform:translateY(-3px)}
+.mcard::before{content:attr(data-tab);position:absolute;top:-22px;left:-1px;background:var(--paper);border:1px solid #e2d8c2;border-bottom:0;border-radius:8px 8px 0 0;padding:2px 14px;font:600 11px var(--mono);letter-spacing:.12em;color:var(--ink2)}
+.mcard .t{font-family:var(--type);font-size:22px;margin:2px 0 4px}
+.mcard.locked{cursor:default;filter:grayscale(1) brightness(.55)}
+.mcard.locked:hover{transform:none}
+.mcard .st{font:600 12px var(--mono);letter-spacing:.08em;margin-top:8px;color:var(--ink2);padding-right:96px}
+.mcard.done .st{color:var(--ok)}
 .notes li{margin:6px 0}
+/* Werkbank */
+.bench{display:flex;flex-wrap:wrap;gap:16px 22px;margin:12px 0}
+.word{display:flex;gap:3px;padding:6px;border-radius:8px;border:2px solid transparent}
+.word.ok{border-color:var(--ok);background:var(--ok-l)}
+.word.bad{border-color:var(--red);background:var(--red-l)}
+.lc{display:flex;flex-direction:column;align-items:center;gap:3px;width:34px}
+.lc .key{font:600 12px var(--mono);color:var(--petrol-d);background:var(--petrol-l);border-radius:4px;width:100%;text-align:center;line-height:1.3}
+.lc .key small{display:block;font-size:10px;color:var(--ink2)}
+.lc .ci{font:600 18px var(--mono);color:var(--red)}
+.lc input{width:34px;height:38px;text-align:center;font:600 18px var(--mono);padding:0;text-transform:uppercase;border:1px solid var(--line);border-radius:6px}
+.lc input:focus{outline:2px solid var(--amber);border-color:var(--amber)}
+.strip{font:600 15px var(--mono);overflow-x:auto;margin:8px 0}
+.strip table{border-collapse:collapse}
+.strip td{width:24px;text-align:center;padding:2px 0;border:1px solid #e9e2d2}
+.strip tr:first-child td{background:var(--petrol-l);color:var(--petrol-d)}
+.strip tr:last-child td{color:var(--red)}
+.strip th{padding:0 8px;font:600 11px var(--mono);color:var(--ink2);text-align:right;white-space:nowrap}
+/* Lückencode */
+.code{background:#14201f;color:#d6e7e4;border-radius:8px;padding:12px 14px;font:14.5px/2.1 var(--mono);overflow-x:auto;white-space:pre}
+.code .cm{color:#7f9a97}
+.code .kw{color:#f2a96b}
+.code .st{color:#b9f0c4}
+.gap{display:inline-flex;align-items:center;gap:2px;vertical-align:middle}
+.gap input{font:600 14px var(--mono);background:#fff8e6;border:2px solid var(--amber);border-radius:5px;padding:1px 5px;color:#2a2008;height:28px}
+.gap input.ok{background:var(--ok-l);border-color:var(--ok)}
+.gap input.bad{background:var(--red-l);border-color:var(--red)}
+.gap .lab{font:600 10px var(--mono);color:var(--amber);margin-right:2px}
+.gap button{font:600 12px var(--mono);border:0;background:#3a4a4c;color:#fff;border-radius:4px;width:22px;height:22px;cursor:pointer}
+.gaphints .fb{margin-top:6px}
+/* Pipeline */
+.pipe{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:10px 0}
+.pipe .box{background:#fff;border:2px solid var(--petrol);border-radius:8px;padding:6px 10px;text-align:center;min-width:70px}
+.pipe .box b{display:block;font:600 22px var(--mono)}
+.pipe .box span{font-size:12px;color:var(--ink2)}
+.pipe .arr{font:600 13px var(--mono);color:var(--petrol-d);text-align:center}
+/* Farben */
+.swatch{width:62px;height:62px;border-radius:50%;border:3px solid rgba(0,0,0,.15);display:inline-block;box-shadow:inset 0 -6px 12px rgba(0,0,0,.15)}
+.pal{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
+.pal button{width:30px;height:30px;border-radius:50%;border:2px solid #fff;outline:1px solid var(--line);cursor:pointer}
+.pal button.sel{outline:3px solid var(--ink)}
+.dh{display:grid;grid-template-columns:1fr 90px 1fr;gap:8px;align-items:center;text-align:center;margin-top:10px}
+.dh .who{font:600 13px var(--mono);letter-spacing:.1em;color:var(--ink2)}
+.dh .mid{font-size:13px;color:var(--ink2)}
+.dh .cell{min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:13px}
+.eve{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:14px}
+/* Mails & Zertifikate */
+.mail{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fff;margin:8px 0}
+.mail .hd{font-size:13px;color:var(--ink2);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:6px;font-family:var(--mono)}
+.certbox{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fbf8f1;font-size:14px}
+.certbox table{border-collapse:collapse;width:100%}
+.certbox td{padding:4px 6px;vertical-align:top;border-bottom:1px solid #eee5d3}
+.certbox td:first-child{color:var(--ink2);width:42%}
+.locks{display:flex;gap:18px;flex-wrap:wrap;align-items:center;justify-content:center;margin:8px 0;font-size:14px;text-align:center}
+.locks svg{display:block;margin:0 auto 4px}
+table.mt{border-collapse:collapse;width:100%;font-size:15px}
+table.mt td,table.mt th{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:middle}
+table.mt th{background:var(--paper2)}
+table.mt select{width:100%}
+/* Graph */
+.graph{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+/* Bericht */
+.report{position:relative;background:var(--paper);border-radius:10px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.report table{border-collapse:collapse;width:100%;font-size:15px;margin:10px 0}
+.report td,.report th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left}
+.report th{font:600 12px var(--mono);letter-spacing:.08em;color:var(--ink2);text-transform:uppercase}
+.bigcode{font:600 34px var(--mono);letter-spacing:.12em;color:var(--petrol-d);background:#fff;border:2px dashed var(--petrol);border-radius:10px;padding:10px 16px;display:inline-block;margin:6px 0;word-break:break-all}
+.tt{overflow-x:auto}
+.tt table{border-collapse:collapse;font-size:14px;width:100%;color:#dfe9e7}
+.tt td,.tt th{border-bottom:1px solid var(--line-d);padding:6px 8px;text-align:center;white-space:nowrap}
+.tt th{font:600 11px var(--mono);letter-spacing:.08em;color:var(--amber)}
+.tt td:first-child,.tt th:first-child{text-align:left}
+.dark input[type=text]{background:#0f1416;color:#e7eeec;border-color:var(--line-d)}
+@media print{header{display:none} body{background:#fff}}
 </style>
 </head>
 <body>
-<header>
-  <h1 id="home">SpionCamp: Tatort Schulnetz</h1>
-  <span class="pill" id="hTeam"></span>
-  <span class="pill" id="hProg"></span>
-</header>
+<header><div class="hwrap">
+  <span class="logo" id="home">SPIONCAMP<b>Tatort Schulnetz</b></span>
+  <div class="pips" id="pips"></div>
+  <span class="chip" id="hTeam"></span>
+  <button class="btn amber small" id="hSave">📷 Stand sichern</button>
+</div></header>
 <main id="app"></main>
 
 <script>
 "use strict";
-/* ================= Zustand ================= */
-const KEY = "spioncamp-tatort-schulnetz-v1";
-let S = load() || fresh();
-function fresh(){ return {team:"", solved:{}, extra:{}, quiz:null, quizDone:false}; }
-function load(){ try{ const t = localStorage.getItem(KEY); return t ? JSON.parse(t) : null; }catch(e){ return null; } }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+/* =====================================================================
+   Zustand
+   ===================================================================== */
+const KEY = "spioncamp-tatort-schulnetz-v2";
+const NSTEPS = [3,4,4,3,4,4];        // Schritte pro Mission
 const TEACHER = location.hash === "#lehrkraft";
+let S = load() || fresh();
+function fresh(){ return {team:"", steps:{}, fails:{}, hints:{}, seen:{}, java:{e:false}, extra:false, quiz:null, quizDone:false, quizPts:0, ui:{}}; }
+function load(){ try{ const t = localStorage.getItem(KEY); return t ? Object.assign(fresh(), JSON.parse(t)) : null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const stepDone = (n,i) => !!(S.steps[n] && S.steps[n][i]);
+const missionDone = (n) => { for(let i=0;i<NSTEPS[n-1];i++) if(!stepDone(n,i)) return false; return true; };
+const missionStarted = (n) => S.steps[n] && S.steps[n].some(Boolean);
+const unlocked = (n) => TEACHER || n===1 || missionDone(n-1);
+function markStep(n,i){ (S.steps[n] = S.steps[n] || [])[i] = true; save(); pips(); }
+function fail(n){ S.fails[n] = (S.fails[n]||0)+1; save(); }
+function hintUsed(n,id){ if(S.seen[id]) return; S.seen[id] = true; S.hints[n] = (S.hints[n]||0)+1; save(); }
+function missionPts(n){ return missionDone(n) ? Math.max(6, 10 - Math.min(4, S.fails[n]||0)) : 0; }
+function totalPts(){ let p = 0; for(let n=1;n<=6;n++) p += missionPts(n); if(S.java.e) p += 4; if(S.extra) p += 2; return p + (S.quizDone ? S.quizPts : 0); }
+const MAXPTS = 6*10 + 4 + 2 + 20;
 
+/* =====================================================================
+   Stand-Code (Teamname + Fortschritt, mit Prüfsumme)
+   ===================================================================== */
+const A32 = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function teamKey(t){ return String(t||"").trim().toLowerCase().replace(/\s+/g," "); }
+function hash(str){ let h = 2166136261>>>0; for(const c of str){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619)>>>0; } return h; }
+function packState(st){
+  let v = 0n, bits = 0;
+  const put = (x,b) => { v = (v<<BigInt(b)) | BigInt(Math.max(0,Math.min((1<<b)-1, x|0))); bits += b; };
+  for(let n=1;n<=6;n++){ let m=0; for(let i=0;i<4;i++) if(st.steps[n] && st.steps[n][i]) m |= (1<<i); put(m,4); put(st.fails[n]||0,3); put(st.hints[n]||0,2); }
+  put(st.java.e?1:0,1); put(st.extra?1:0,1); put(st.quizDone?1:0,1); put(st.quizPts||0,5);
+  return [v,bits];
+}
+function makeCode(st){
+  const [v,bits] = packState(st);              // 62 Bit
+  const chk = BigInt(hash(teamKey(st.team)+"|"+v.toString(36)+"|NB-spion") & 0x1FFF); // 13 Bit
+  let all = (v<<13n) | chk, s = "";
+  for(let i=0;i<15;i++){ s = A32[Number(all & 31n)] + s; all >>= 5n; }
+  return s.slice(0,5)+"-"+s.slice(5,10)+"-"+s.slice(10);
+}
+function readCode(team, code){
+  const c = String(code).toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(c.length !== 15) return null;
+  let all = 0n; for(const ch of c){ const i = A32.indexOf(ch); if(i<0) return null; all = (all<<5n) | BigInt(i); }
+  const chk = all & 0x1FFFn, v = all >> 13n;
+  if(BigInt(hash(teamKey(team)+"|"+v.toString(36)+"|NB-spion") & 0x1FFF) !== chk) return null;
+  let x = v; const take = (b) => { const r = Number(x & ((1n<<BigInt(b))-1n)); x >>= BigInt(b); return r; };
+  const st = fresh(); st.team = String(team).trim();
+  st.quizPts = take(5); st.quizDone = !!take(1); st.extra = !!take(1); st.java.e = !!take(1);
+  for(let n=6;n>=1;n--){ st.hints[n] = take(2); st.fails[n] = take(3); const m = take(4); st.steps[n] = [0,1,2,3].map(i => !!(m & (1<<i))); }
+  return st;
+}
+
+/* =====================================================================
+   Helfer
+   ===================================================================== */
 const app = document.getElementById("app");
 const $ = (h) => { const d = document.createElement("div"); d.innerHTML = h.trim(); return d.firstElementChild; };
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm = (s) => String(s).toUpperCase().replace(/Ä/g,"AE").replace(/Ö/g,"OE").replace(/Ü/g,"UE").replace(/ß/g,"SS").replace(/[^A-Z0-9]/g,"");
+const ncode = (s) => String(s).replace(/\s+/g,"").replace(/"/g,"'");
 function shakeEl(el){ el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); }
 function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-function caesar(t,k){ return t.replace(/[A-Z]/g, c => String.fromCharCode((c.charCodeAt(0)-65+k+26)%26+65)); }
-function code(team,pts){ const t=(team||"").trim().toLowerCase()+"|"+pts+"|NB-spion"; let h=5381; for(const c of t) h=((h*33)^c.charCodeAt(0))>>>0; const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let r=""; for(let i=0;i<5;i++){ r+=A[h%32]; h=Math.floor(h/32); } return r; }
+const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function caesar(t,k){ return t.replace(/[A-Z]/g, c => String.fromCharCode((c.charCodeAt(0)-65+k+260)%26+65)); }
 
-/* ================= Beweismittel ================= */
-const N1 = "ZODQ SDVVZRUW JHIXQGHQ";
+function pips(){
+  const p = document.getElementById("pips"); p.innerHTML = "";
+  for(let n=1;n<=6;n++) p.append($(`<span class="pip ${missionDone(n)?"done":missionStarted(n)?"part":""}" title="Mission ${n}">${n}</span>`));
+  const ht = document.getElementById("hTeam"); ht.textContent = S.team ? "Team " + S.team : (TEACHER ? "Lehrkraft" : "kein Team");
+}
+document.getElementById("home").onclick = () => home();
+document.getElementById("hSave").onclick = () => report();
+
+/* ---------- Bausteine ---------- */
+// Multiple Choice: opts = [[text, richtig, warum]]
+function mc(el, n, q, opts, solved, onOk){
+  const box = $(`<div><p><b>${q}</b></p><div class="o"></div></div>`); el.append(box);
+  const od = box.querySelector(".o");
+  shuffle(opts).forEach(([t, ok, why]) => {
+    const b = $(`<button class="opt">${t}</button>`);
+    if(solved && ok) b.classList.add("good");
+    b.onclick = () => {
+      if(solved || b.classList.contains("good")) return;
+      if(ok){ b.classList.add("good"); if(why) b.append($(`<span class="why">${why}</span>`)); solved = true; onOk(); }
+      else if(!b.classList.contains("bad")){ b.classList.add("bad"); if(why) b.append($(`<span class="why">${why}</span>`)); fail(n); shakeEl(b); }
+    };
+    od.append(b);
+  });
+}
+// Freie Antwort
+function ask(el, n, q, check, solved, onOk, ph){
+  const box = $(`<div><p><b>${q}</b></p><div class="row"><input type="text" class="grow" placeholder="${ph||"Antwort"}"><button class="btn">Prüfen</button></div><div class="out"></div></div>`); el.append(box);
+  const inp = box.querySelector("input"), out = box.querySelector(".out");
+  if(solved){ inp.value = "✓ gelöst"; inp.disabled = true; box.querySelector("button").disabled = true; return; }
+  const go = () => { if(!inp.value.trim()) return; if(check(inp.value)){ inp.disabled = true; box.querySelector("button").disabled = true; out.innerHTML = ""; onOk(); } else { fail(n); out.innerHTML = `<div class="fb err">Das stimmt noch nicht. Prüft eure Lösung oder öffnet eine Hilfe.</div>`; shakeEl(box); } };
+  box.querySelector("button").onclick = go; inp.onkeydown = e => { if(e.key==="Enter") go(); };
+}
+// Hilfen
+function hints(el, n, id, list){
+  list.forEach((h,i) => { const d = $(`<details class="hint"><summary>💡 Hilfe ${list.length>1?i+1:""}</summary><div>${h}</div></details>`); d.ontoggle = () => { if(d.open) hintUsed(n, id+"-"+i); }; el.append(d); });
+}
+// Werkbank: Geheimtext Buchstabe für Buchstabe entschlüsseln
+function bench(el, n, cipher, plain, solved, onOk, top){
+  const wrap = $(`<div class="bench"></div>`); el.append(wrap);
+  const cw = cipher.split(" "), pw = plain.split(" "); let idx = 0; const inputs = [];
+  const state = cw.map(() => false);
+  cw.forEach((w,wi) => {
+    const wd = $(`<div class="word"></div>`); wrap.append(wd);
+    const my = [];
+    for(let li=0; li<w.length; li++){
+      const lc = $(`<div class="lc">${top ? `<span class="key">${top(idx)}</span>` : ""}<span class="ci">${w[li]}</span><input type="text" maxlength="1" aria-label="Klartextbuchstabe"></div>`);
+      const inp = lc.querySelector("input"); my.push(inp); inputs.push(inp); idx++;
+      if(solved){ inp.value = pw[wi][li]; inp.disabled = true; }
+      wd.append(lc);
+    }
+    if(solved){ wd.classList.add("ok"); state[wi] = true; }
+    my.forEach((inp,k) => {
+      inp.oninput = () => {
+        inp.value = inp.value.toUpperCase().replace(/[^A-ZÄÖÜ]/g,"").slice(0,1);
+        wd.classList.remove("bad");
+        if(inp.value){ const all = inputs.indexOf(inp); for(let j=all+1;j<inputs.length;j++){ if(!inputs[j].disabled){ inputs[j].focus(); break; } } }
+        if(my.every(x => x.value)){
+          const guess = my.map(x=>x.value).join("");
+          if(guess === pw[wi]){ wd.classList.add("ok","pop"); my.forEach(x => x.disabled = true); state[wi] = true; if(state.every(Boolean)) onOk(); }
+          else { wd.classList.add("bad"); shakeEl(wd); if(!wd.dataset.f){ wd.dataset.f = 1; fail(n); } }
+        }
+      };
+      inp.onkeydown = (e) => { if(e.key==="Backspace" && !inp.value){ const all = inputs.indexOf(inp); for(let j=all-1;j>=0;j--){ if(!inputs[j].disabled){ inputs[j].focus(); inputs[j].value=""; break; } } } };
+    });
+  });
+}
+// Chiffrierscheibe
+function disc(el, start, onK){
+  const d = $(`<div><div class="row" style="justify-content:center"><button class="btn small ghost" data-d="-1">◀</button><span class="mono">Verschiebung k = <b class="kk">0</b></span><button class="btn small ghost" data-d="1">▶</button></div>
+    <div style="max-width:340px;margin:6px auto"><svg viewBox="-170 -170 340 340" width="100%"></svg></div>
+    <div class="strip"><table><tr><th>Klartext</th></tr><tr><th>Geheimtext</th></tr></table></div></div>`);
+  el.append(d); let k = start||0; const svg = d.querySelector("svg"), tr = d.querySelectorAll(".strip tr");
+  function draw(){
+    let s = `<circle r="162" fill="#d9ecec" stroke="#155961" stroke-width="2"/><circle r="120" fill="#fffdf8" stroke="#155961" stroke-width="2"/><circle r="80" fill="#f5efe2" stroke="#d9cfba"/>`;
+    for(let i=0;i<26;i++){
+      const a = (i*360/26 - 90) * Math.PI/180, ca = Math.cos(a), sa = Math.sin(a);
+      s += `<text x="${141*ca}" y="${141*sa+6}" text-anchor="middle" font-size="17" font-family="IBM Plex Mono,monospace" fill="#155961" font-weight="600">${ABC[i]}</text>`;
+      s += `<text x="${100*ca}" y="${100*sa+6}" text-anchor="middle" font-size="16" font-family="IBM Plex Mono,monospace" fill="#c43a2c" font-weight="600">${ABC[(i+k)%26]}</text>`;
+    }
+    s += `<text y="-4" text-anchor="middle" font-size="12" fill="#6a645a">außen: Klartext</text><text y="14" text-anchor="middle" font-size="12" fill="#c43a2c">innen: Geheimtext</text>`;
+    svg.innerHTML = s; d.querySelector(".kk").textContent = k;
+    tr[0].innerHTML = `<th>Klartext</th>` + ABC.split("").map(c=>`<td>${c}</td>`).join("");
+    tr[1].innerHTML = `<th>Geheimtext</th>` + ABC.split("").map((c,i)=>`<td>${ABC[(i+k)%26]}</td>`).join("");
+    if(onK) onK(k);
+  }
+  d.querySelectorAll("button[data-d]").forEach(b => b.onclick = () => { k = (k + 26 + (+b.dataset.d)) % 26; draw(); });
+  draw();
+}
+// Lückencode: parts = Strings und {g:"L1"}
+function gapCode(el, n, parts, G, solvedFn, onOk){
+  const solved = solvedFn();
+  const pre = $(`<div class="code"></div>`), hb = $(`<div class="gaphints"></div>`);
+  el.append(pre); const inputs = {};
+  parts.forEach(p => {
+    if(typeof p === "string"){ pre.append(document.createTextNode("")); pre.insertAdjacentHTML("beforeend", hl(p)); return; }
+    const g = G[p.g];
+    const span = $(`<span class="gap"><span class="lab">${p.g}</span><input type="text" spellcheck="false" autocomplete="off" style="width:${Math.max(3,g.w)+1}ch" placeholder="${esc(g.ph)}"><button title="Hilfe zu ${p.g}">?</button></span>`);
+    const inp = span.querySelector("input"); inputs[p.g] = inp;
+    if(S.ui["gap"+p.g]) inp.value = S.ui["gap"+p.g];
+    if(solved){ inp.value = g.show; inp.classList.add("ok"); inp.disabled = true; }
+    inp.oninput = () => { inp.classList.remove("ok","bad"); S.ui["gap"+p.g] = inp.value; save(); };
+    span.querySelector("button").onclick = () => {
+      const id = "gap-"+p.g; const lvl = (S.ui[id]||0); const txt = g.hints[Math.min(lvl, g.hints.length-1)];
+      hintUsed(n, id+"-"+lvl); S.ui[id] = Math.min(lvl+1, g.hints.length-1); save();
+      hb.prepend($(`<div class="fb info pop"><b>${p.g}:</b> ${txt}</div>`));
+    };
+    pre.append(span);
+  });
+  el.append(hb);
+  const ctrl = $(`<div class="row" style="margin-top:10px"><button class="btn">Lücken prüfen</button><span class="small res"></span></div>`); el.append(ctrl);
+  if(solved){ ctrl.querySelector("button").disabled = true; ctrl.querySelector(".res").textContent = "✓ alle Lücken richtig"; return; }
+  ctrl.querySelector("button").onclick = () => {
+    let right = 0, total = 0, anyWrong = false;
+    for(const id in inputs){ total++; const inp = inputs[id], g = G[id];
+      if(!inp.value.trim()){ inp.classList.add("bad"); anyWrong = true; continue; }
+      if(g.ok.some(a => ncode(a) === ncode(inp.value))){ inp.classList.add("ok"); inp.classList.remove("bad"); right++; }
+      else { inp.classList.add("bad"); inp.classList.remove("ok"); anyWrong = true; }
+    }
+    ctrl.querySelector(".res").textContent = `${right} von ${total} Lücken richtig`;
+    if(anyWrong){ fail(n); shakeEl(pre); }
+    else { Object.values(inputs).forEach(i => i.disabled = true); ctrl.querySelector("button").disabled = true; onOk(); }
+  };
+}
+function hl(s){ return esc(s).replace(/(\/\/[^\n]*)/g,'<span class="cm">$1</span>').replace(/\b(public|int|char|return|for|if|else|void|String|new)\b/g,'<span class="kw">$1</span>'); }
+
+/* =====================================================================
+   Beweismittel
+   ===================================================================== */
+const N1 = "ZODQ SDVVZRUW JHIXQGHQ", P1 = "WLAN PASSWORT GEFUNDEN";
 const N2 = "HT MYLPAHN ZALSSLU DPY PT SLOYLYGPTTLY LPU LPNLULZ DSHU TPA KLT UHTLU ZJOBSL NHZA HBM";
 const N2X = "EXAKDKTXYMX DEBVDXG CXWX SXKMBYBDTMLPTKGNGZ PXZ";
 const N3 = "FYDPCP NLPDLC YLNSCTNSEPY DTYO KF FYDTNSPC HPYY OTP DNSFWP OTP WZROLEPTPY OPD DPCGPCD WTPDE VLYY DTP UPOP YLNSCTNSE TY HPYTRPY XTYFEPY PYEDNSWFPDDPWY OPDSLWM HPNSDPWY HTC LM DZQZCE KF GTRPYPCP OPY RPSPTXPY DNSWFPDDPW DPYOP TNS OTC SPFEP LMPYO APC XLTW WZPDNSP OTP XLTW DZQZCE YLNS OPX WPDPY";
-const N4 = "WOFLGYVG JHVKRZ CLX FEZCGI";
+const N4 = "WOFLGYVG JHVKRZ CLX FEZCGI", P4 = "FALSCHES PORTAL IST ONLINE", K4 = "ROUTER";
 
-/* ================= Missionen ================= */
-const M = [
- {n:1, name:"Die abgefangene Nachricht", topic:"Fachbegriffe, Caesar von Hand, Kerckhoffs",
-  story:`Montag, 7:40 Uhr. Der Störfall im Schulnetz letzte Woche war kein Zufall. Die Schulleitung hat in den Protokollen des Notenservers Anmeldungen vom Wochenende gefunden, mit den Konten von drei Lehrkräften. Keine der drei war am Wochenende online.<br><br>Euer Kurs wird zum Forensik-Team. Ihr sollt herausfinden, <b>wer es war</b>, <b>wie es passiert ist</b> und <b>wie die Schule es künftig besser macht</b>.<br><br>In der Firewall findet ihr eine kurze Chatnachricht, die am Donnerstag aus dem Gast-WLAN verschickt wurde. Sie ist verschlüsselt, wahrscheinlich mit einem ganz einfachen Verfahren.`,
-  evidence:`<span class="sys">[Firewall] Do 16:42  Gast-WLAN  ->  extern  Chat:</span>\n${N1}`,
-  tasks:[
-   "Klärt die Fachbegriffe <b>Klartext, Geheimtext, Schlüssel, Verschlüsseln, Entschlüsseln</b> und ordnet sie dem Beweisstück zu (AB 4, Aufgabe 1).",
-   "Entschlüsselt die Nachricht mit der Chiffrierscheibe. Probiert verschiedene Verschiebungen aus. Tipp: Das erste Wort hat nur vier Buchstaben.",
-   "Notiert: Mit welchem Schlüssel wurde verschlüsselt? Wie seid ihr darauf gekommen?",
-   "Die Täter dachten: \"Niemand weiß, wie wir verschlüsseln.\" Erklärt mit dem Prinzip von Kerckhoffs, warum das kein Schutz ist."],
-  ask:"Wie lautet die Nachricht im Klartext?", check: a => norm(a)==="WLANPASSWORTGEFUNDEN",
-  clue:"Die Täter kannten das WLAN-Passwort der Schule. Es hing auf einem Klebezettel am Bildschirm im Lehrerzimmer.",
-  hints:["Außen auf der Scheibe steht der Klartext, innen der Geheimtext. Sucht den Geheimtext-Buchstaben innen und lest außen ab.",
-         "Ein Wort mit vier Buchstaben, das zu einem Schulnetz passt … und das mit einem W beginnt.",
-         "Der Schlüssel ist 3: Z wird zu W, O wird zu L."],
-  tool:"scheibe"},
- {n:2, name:"Das Java-Labor", topic:"Caesar in Java programmieren (BlueJ)",
-  story:`Die Spurensicherung hat im Chatprotokoll vom Freitag eine längere Nachricht gefunden. Von Hand dauert das zu lange, und es kommen noch mehr Nachrichten. Ihr baut euch deshalb ein eigenes Werkzeug: ein Java-Programm, das Caesar ver- und entschlüsselt.<br><br>Auf einem Notizzettel im Papierkorb des Lehrerzimmers stand: <b>k = 7</b>.`,
-  evidence:`<span class="sys">[Chatprotokoll] Fr 11:58  Gast-WLAN  ->  extern:</span>\n${N2}`,
-  tasks:[
-   "Ladet das BlueJ-Projekt herunter (Knopf unten) und öffnet es in BlueJ: <b>Projekt → ZIP/JAR öffnen …</b> oder die ZIP-Datei entpacken und <code>package.bluej</code> doppelklicken.",
-   "<b>Stufe Basis:</b> Vervollständigt <code>verschluesseln(char c, int k)</code> in der Klasse <code>Caesar</code>. Prüfen: Rechtsklick auf <code>Pruefstand</code> → <code>pruefeBasis()</code>.",
-   "<b>Stufe Standard:</b> Schreibt <code>verschluesselnText(String text, int k)</code>. Prüfen mit <code>pruefeStandard()</code>.",
-   "<b>Stufe Experte:</b> <code>entschluesselnText</code>, <code>bruteForce</code> und <code>zaehleBuchstaben</code>. Prüfen mit <code>pruefeExperte()</code>.",
-   "Entschlüsselt mit eurem Programm die Nachricht vom Freitag (in der Klasse <code>Beweismittel</code> als <code>NACHRICHT_2</code>). Tipp für alle ohne entschluesselnText: Verschlüsseln mit 26 − 7 = 19 macht die Verschiebung rückgängig.",
-   "<b>Für alle, im Heft:</b> Erklärt in zwei bis drei Sätzen, was euer Code tut und warum <code>% 26</code> nötig ist."],
-  ask:"Unter welchem Namen haben die Täter ihr eigenes WLAN aufgebaut?", check: a => norm(a).includes("SCHULEGAST"),
-  clue:"Am Freitag haben die Täter im Lehrerzimmer ein eigenes WLAN mit dem Namen SCHULE GAST aufgebaut. Es sieht aus wie das echte Gast-WLAN.",
-  extra:{ask:"Expertenspur: Was steht in NACHRICHT_2_EXPERTE? (Schlüssel unbekannt, nutzt bruteForce)", check:a=>norm(a)==="LEHRKRAEFTEKLICKENJEDEZERTIFIKATSWARNUNGWEG",
-         clue:"Expertenspur: Die Täter verlassen sich darauf, dass Lehrkräfte Zertifikatswarnungen im Browser einfach wegklicken."},
-  hints:["Basis: <code>nummer + k</code> kann größer als 25 werden. Der Rest beim Teilen durch 26 (<code>% 26</code>) bringt die Zahl wieder in den Bereich 0 bis 25.",
-         `Standard: So kann das Gerüst aussehen:<pre>String ergebnis = "";
-for (int i = 0; i &lt; text.length(); i++) {
-    char zeichen = text.charAt(i);
-    if (zeichen &gt;= 'A' &amp;&amp; zeichen &lt;= 'Z') {
-        ergebnis = ergebnis + ...;
-    } else {
-        ergebnis = ergebnis + ...;
-    }
-}
-return ergebnis;</pre>`,
-         "Experte: Entschlüsseln mit k ist dasselbe wie Verschlüsseln mit 26 − k. bruteForce ruft entschluesselnText in einer Schleife für k = 1 bis 25 auf."],
-  tool:"bluej"},
- {n:3, name:"Angriff auf Caesar", topic:"Brute Force, Häufigkeitsanalyse, Vigenère",
-  story:`Am Samstag schicken die Täter eine lange Nachricht, und diesmal fehlt der Notizzettel. Der Schlüssel ist unbekannt. Zeit für einen echten Angriff: Ihr knackt Caesar auf zwei Arten und vergleicht, welche schneller ist.`,
-  evidence:`<span class="sys">[Chatprotokoll] Sa 20:14  extern  ->  extern (über Schulserver):</span>\n${N3}`,
-  tasks:[
-   "<b>Brute Force:</b> Wie viele Schlüssel müsst ihr bei Caesar höchstens ausprobieren? Wer bruteForce programmiert hat, lässt es laufen (<code>Beweismittel.NACHRICHT_3</code>). Alle anderen probieren die ersten beiden Wörter mit der Chiffrierscheibe aus Mission 1 (AB 4, Aufgabe 2).",
-   "<b>Häufigkeitsanalyse:</b> Zählt mit dem Häufigkeitszähler unten, welcher Buchstabe am häufigsten vorkommt. Im Deutschen ist das fast immer E. Berechnet daraus den Schlüssel (AB 4, Aufgabe 3). Experten nutzen ihre Methode <code>zaehleBuchstaben</code>.",
-   "Entschlüsselt die Nachricht. Wovor haben die Täter Angst, und was machen sie jetzt anders?",
-   "Vigenère: Verschlüsselt ANANAS mit dem Schlüssel KEY von Hand und erklärt, warum die Häufigkeitsanalyse jetzt nicht mehr so einfach klappt (AB 4, Aufgabe 6)."],
-  ask:"Mit welchem Schlüssel k wurde die Nachricht vom Samstag verschlüsselt?", check: a => norm(a)==="11" || norm(a)==="K11",
-  clue:"Die Täter wechseln auf das Vigenère-Verfahren. Den Schlüssel wollen sie sich per Mail schicken.",
-  hints:["Im Geheimtext ist P am häufigsten. Wenn P für E steht: Wie weit ist es von E bis P?",
-         "E ist der 5. Buchstabe (Nummer 4), P der 16. (Nummer 15). 15 − 4 = …"],
-  tool:"haeufigkeit"},
- {n:4, name:"Das Schlüsselproblem", topic:"Schlüsselaustausch, Anzahl Schlüssel, Farbmisch-Experiment",
-  story:`Im Protokoll des Mailservers findet ihr eine Mail vom Samstagabend. Sie ist <b>nicht verschlüsselt</b>. Darin steht nur ein Wort: der Vigenère-Schlüssel. Kurz danach wird eine neue Nachricht abgefangen.<br><br>Damit habt ihr gezeigt, wo das Problem jedes symmetrischen Verfahrens liegt: Der Schlüssel muss irgendwie zum Empfänger.`,
-  evidence:`<span class="sys">[Mailserver] Sa 21:02  Betreff: (leer)  unverschlüsselt</span>\nROUTER\n\n<span class="sys">[Chatprotokoll] Sa 21:30  Vigenère:</span>\n${N4}`,
-  tasks:[
-   "Entschlüsselt die Vigenère-Nachricht mit dem Schlüssel ROUTER und dem Vigenère-Quadrat. Leerzeichen zählen nicht mit, der Schlüssel läuft nur über die Buchstaben.",
-   "Erklärt, warum die unverschlüsselte Mail der entscheidende Fehler der Täter war. Formuliert das Schlüsselaustauschproblem allgemein.",
-   "Unser Kurs hat 20 Personen. Jede soll mit jeder geheim schreiben können. Wie viele symmetrische Schlüssel braucht ihr? Begründet die Formel n · (n − 1) / 2 (AB 4, Aufgabe 7 und AB 5, Aufgabe 1).",
-   "Farbmisch-Experiment: Wie hätten die Täter einen gemeinsamen Schlüssel vereinbaren können, ohne dass wir ihn im Protokoll sehen? Probiert es unten aus und erklärt, warum Eve die gemeinsame Farbe nicht herstellen kann (AB 5, Aufgabe 4)."],
-  ask:"Wie lautet die Vigenère-Nachricht im Klartext?", check: a => norm(a)==="FALSCHESPORTALISTONLINE",
-  clue:"Die Täter betreiben ein gefälschtes Anmeldeportal, das wie das Notenportal der Schule aussieht.",
-  hints:["Erster Buchstabe: W mit Schlüsselbuchstabe R. Sucht in der Zeile R den Buchstaben W. Die Spalte darüber ist der Klartext.",
-         "Die ersten beiden Buchstaben sind F und A."],
-  tool:"vigenere"},
- {n:5, name:"Echt oder gefälscht?", topic:"Schlüsselpaar, Signatur, Man-in-the-Middle, Zertifikate",
-  story:`Am Freitag um 15:10 Uhr bekamen alle Lehrkräfte zwei Mails, beide angeblich von der Schulleitung. Eine davon führt zum gefälschten Portal. Wer im WLAN SCHULE GAST war, bekam beim Öffnen des Portals außerdem eine Zertifikatswarnung, die viele weggeklickt haben.<br><br>Prüft die Signaturen und die Zertifikate wie ein Browser.`,
-  evidence:null,
-  tasks:[
-   "Erklärt das Prinzip des Schlüsselpaars mit dem Bild von Schloss und Schlüssel (AB 5, Aufgabe 2).",
-   "Füllt die Merktabelle aus: Wer nutzt welchen Schlüssel beim Verschlüsseln und beim Signieren? (AB 5, Aufgabe 3)",
-   "Prüft unten die Signaturen der beiden Mails. Welchen Schlüssel braucht ihr dafür?",
-   "Vergleicht die beiden Zertifikate. Erklärt, wie der Man-in-the-Middle-Angriff im WLAN SCHULE GAST funktioniert hat und warum ein Zertifikat ihn verhindert hätte (AB 5, Aufgabe 5)."],
-  ask:"Wer hat das gefälschte Zertifikat ausgestellt? (Feld „Ausgestellt von“)", check: a => norm(a).includes("BRANDT"),
-  clue:"Das gefälschte Portal nutzt ein selbst signiertes Zertifikat. Ausgestellt von: K. Brandt IT-Service.",
-  hints:["Eine Signatur prüft man mit dem öffentlichen Schlüssel des Absenders, also der Schulleitung.",
-         "Ein Zertifikat ist nur vertrauenswürdig, wenn eine Zertifizierungsstelle es unterschrieben hat, die der Browser kennt. Steht bei „Ausgestellt von“ dasselbe wie bei „Ausgestellt für“, hat sich jemand selbst unterschrieben."],
-  tool:"signatur"},
- {n:6, name:"Finale: Wer war es?", topic:"Angriff rekonstruieren, hybride Verfahren, Sicherheitskonzept",
-  story:`Ihr habt alle Spuren zusammen. Jetzt rekonstruiert ihr den Angriff, überführt den Täter und schreibt für die Schulleitung ein Sicherheitskonzept: Wie macht die Schule es künftig besser?`,
-  evidence:`<span class="sys">[Besucherliste Sekretariat] Freitag</span>\n 9:00-12:00  Fortbildung: Referentin Dr. S. Lenz (Lehrerzimmer)\n10:15-11:00  PrintPro, Wartung Kopierer (Raum 104)\n14:30-15:20  K. Brandt IT-Service, "Abholung Altgeräte" (Lehrerzimmer)\n<span class="sys">Hinweis Schulträger: Der Vertrag mit K. Brandt IT-Service endete im Juli. Eine Abholung war nicht beauftragt.</span>`,
-  tasks:[
-   "Bringt die Schritte des Angriffs in die richtige Reihenfolge (unten).",
-   "Wer war es? Begründet eure Entscheidung mit mindestens zwei Spuren aus der Fallakte.",
-   "Erklärt, wie HTTPS symmetrische und asymmetrische Verfahren kombiniert und warum (AB 6, Aufgabe 1 und 2).",
-   "<b>Sicherheitskonzept für die Schulleitung</b> (Plakat oder Heft): Mindestens fünf Maßnahmen. Zu jeder Maßnahme: Welchen Schritt des Angriffs hätte sie verhindert, und welches Verfahren steckt dahinter? Unterscheidet auch Transport- und Ende-zu-Ende-Verschlüsselung (AB 6, Aufgabe 4).",
-   "Zum Schluss: Abschlussquiz für die Rangliste."],
-  ask:null, clue:"Täter überführt: K. Brandt IT-Service, der ehemalige externe Dienstleister der Schule.",
-  hints:["Achtet auf die Spur aus Mission 5 und auf die Besucherliste: Wer war am Freitag zur richtigen Zeit im Lehrerzimmer?"],
-  tool:"finale"}
-];
-
-/* ================= Navigation ================= */
-function unlocked(n){ return TEACHER || n===1 || !!S.solved[n-1]; }
-function header(){
-  const ht = document.getElementById("hTeam"); ht.textContent = S.team ? "Team: "+S.team : ""; ht.style.display = S.team ? "" : "none";
-  const d = Object.keys(S.solved).length;
-  document.getElementById("hProg").textContent = d+" von 6 Missionen gelöst" + (TEACHER?" · Lehrkraft":"");
-}
-document.getElementById("home").onclick = () => { location.hash = TEACHER ? "#lehrkraft" : ""; home(); };
-
-function home(){
-  header(); app.innerHTML = ""; window.scrollTo(0,0);
-  app.append($(`<div class="card story"><span class="tag">Fallakte</span><h2>Tatort Schulnetz</h2>
-    <p>Jemand hat sich Zugang zum Notenserver der Schule verschafft. Euer Kurs ist das Forensik-Team. Ihr arbeitet euch durch sechs Missionen, entschlüsselt abgefangene Nachrichten und baut Schritt für Schritt das Wissen auf, mit dem ihr den Täter überführt.</p>
-    <p><b>Am Ende steht euer Sicherheitskonzept für die Schulleitung.</b></p>
-    <div class="row"><input type="text" id="team" placeholder="Name eures Teams" value="${S.team.replace(/"/g,"&quot;")}" maxlength="40"><button class="btn" id="saveTeam">Speichern</button></div>
-    <p class="small">Euer Fortschritt wird nur in diesem Browser gespeichert. Jede Mission öffnet sich, wenn die vorherige gelöst ist.</p></div>`));
-  app.querySelector("#saveTeam").onclick = () => { S.team = app.querySelector("#team").value.trim(); save(); header(); };
-  const grid = $(`<div class="missions"></div>`);
-  for(const m of M){
-    const done = !!S.solved[m.n], open = unlocked(m.n);
-    const b = $(`<button class="ms ${done?"done":""} ${open?"":"locked"}"><div class="n">${m.n}</div><div class="t">${m.name}</div><div class="small">${m.topic}</div><div class="small" style="margin-top:6px">${done?"✓ gelöst":open?"offen":"gesperrt"}</div></button>`);
-    if(open) b.onclick = () => mission(m.n);
-    grid.append(b);
-  }
-  app.append(grid);
-  const notes = M.filter(m => S.solved[m.n]).map(m => `<li>${m.clue}</li>`).concat(M.filter(m=>m.extra && S.extra[m.n]).map(m=>`<li>${m.extra.clue}</li>`));
-  app.append($(`<div class="card clue" style="margin-top:16px"><h3>Ermittlungsnotizen</h3>${notes.length?`<ul class="notes">${notes.join("")}</ul>`:`<p class="small">Noch keine Spuren. Startet mit Mission 1.</p>`}</div>`));
-  if(TEACHER) app.append($(`<div class="card"><h3>Lehrkraft</h3><p class="small">Im Modus #lehrkraft sind alle Missionen offen. Prüfcodes der Rangliste kontrollieren: Teamname und Punkte eingeben.</p><div class="row"><input type="text" id="tn" placeholder="Teamname"><input type="text" id="tp" placeholder="Punkte" style="max-width:100px"><button class="btn" id="tc">Code anzeigen</button><span id="tr" class="mono"></span></div></div>`));
-  if(TEACHER) app.querySelector("#tc").onclick = () => { app.querySelector("#tr").textContent = code(app.querySelector("#tn").value, parseInt(app.querySelector("#tp").value,10)||0); };
-}
-
-function mission(n){
-  const m = M[n-1]; header(); app.innerHTML = ""; window.scrollTo(0,0);
-  app.append($(`<div class="card story"><span class="tag">Mission ${n} von 6 · ${m.topic}</span><h2>${m.name}</h2><p>${m.story}</p>${m.evidence?`<div class="evidence">${m.evidence}</div>`:""}</div>`));
-  app.append($(`<div class="card"><h3>Euer Auftrag</h3><ol class="tasks">${m.tasks.map(t=>`<li>${t}</li>`).join("")}</ol></div>`));
-  const tool = $(`<div class="card"></div>`); app.append(tool); TOOLS[m.tool](tool);
-  if(m.hints.length) app.append($(`<div class="card"><h3>Hilfekarten</h3>${m.hints.map((h,i)=>`<details><summary>Hilfe ${i+1}</summary><div class="inner">${h}</div></details>`).join("")}</div>`));
-  if(m.ask) app.append(answerBox(m.ask, m.check, () => { S.solved[n] = true; save(); }, S.solved[n], m.clue));
-  if(m.extra) app.append(answerBox(m.extra.ask, m.extra.check, () => { S.extra[n] = true; save(); }, S.extra[n], m.extra.clue));
-  const nav = $(`<div class="row"><button class="btn sec" id="back">Zur Fallakte</button>${n<6?`<button class="btn" id="next">Zu Mission ${n+1}</button>`:""}</div>`);
-  nav.querySelector("#back").onclick = home;
-  if(n<6) nav.querySelector("#next").onclick = () => { if(unlocked(n+1)) mission(n+1); else shakeEl(nav.querySelector("#next")); };
-  app.append(nav);
-}
-
-function answerBox(ask, check, onOk, done, clue){
-  const c = $(`<div class="card clue"><h3>Ermittlungsergebnis</h3><p>${ask}</p><div class="row"><input type="text" placeholder="Antwort"><button class="btn">Prüfen</button></div><div class="out"></div></div>`);
-  const inp = c.querySelector("input"), out = c.querySelector(".out");
-  const show = () => { out.innerHTML = `<div class="fb ok"><b>Richtig. Neue Spur:</b> ${clue}</div>`; };
-  if(done) show();
-  const go = () => { if(check(inp.value)){ onOk(); show(); header(); } else { out.innerHTML = `<div class="fb err">Das passt noch nicht. Prüft eure Lösung oder nutzt eine Hilfekarte.</div>`; shakeEl(c); } };
-  c.querySelector("button").onclick = go; inp.onkeydown = e => { if(e.key==="Enter") go(); };
-  return c;
-}
-
-/* ================= Werkzeuge ================= */
-const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const TOOLS = {
- scheibe(el){
-  el.innerHTML = `<h3>Chiffrierscheibe</h3><p class="small">Außen: Klartext. Innen: Geheimtext. Dreht die innere Scheibe.</p>
-   <div class="row"><button class="btn small sec" id="m">◀</button><span>Verschiebung k = <b id="k">0</b></span><button class="btn small sec" id="p">▶</button></div>
-   <div style="max-width:380px;margin:8px auto"><svg id="disc" viewBox="-170 -170 340 340" width="100%"></svg></div>
-   <p class="small">Zum Mitschreiben:</p><textarea rows="2" placeholder="Eure Entschlüsselung …"></textarea>`;
-  let k = 0; const svg = el.querySelector("#disc");
-  function draw(){
-    let s = `<circle r="160" fill="#e3f0f1" stroke="#1f6f78"/><circle r="118" fill="#fff" stroke="#1f6f78"/><circle r="78" fill="#f3f1ec" stroke="#d6d2c9"/>`;
-    for(let i=0;i<26;i++){
-      const a = (i*360/26 - 90) * Math.PI/180, ca=Math.cos(a), sa=Math.sin(a);
-      s += `<line x1="${118*ca}" y1="${118*sa}" x2="${160*ca}" y2="${160*sa}" stroke="#c9dfe1" transform="rotate(${180/26})"/>`;
-      s += `<text x="${139*ca}" y="${139*sa+6}" text-anchor="middle" font-size="17" fill="#164f56" font-weight="bold">${ABC[i]}</text>`;
-      s += `<text x="${98*ca}" y="${98*sa+6}" text-anchor="middle" font-size="16" fill="#b3402f" font-weight="bold">${ABC[(i+k)%26]}</text>`;
-    }
-    s += `<text y="-6" text-anchor="middle" font-size="13" fill="#5b6366">Klartext außen</text><text y="14" text-anchor="middle" font-size="13" fill="#b3402f">Geheimtext innen</text>`;
-    svg.innerHTML = s; el.querySelector("#k").textContent = k;
-  }
-  el.querySelector("#m").onclick = () => { k = (k+25)%26; draw(); };
-  el.querySelector("#p").onclick = () => { k = (k+1)%26; draw(); };
-  draw();
- },
- bluej(el){
-  el.innerHTML = `<h3>BlueJ-Projekt</h3>
-   <p><a class="btn" href="SpionCamp_Caesar.zip" download>BlueJ-Projekt herunterladen (ZIP)</a></p>
-   <p class="small">In BlueJ: <b>Projekt → ZIP/JAR öffnen …</b> und die heruntergeladene Datei wählen. Alternativ die ZIP-Datei entpacken und im Ordner <code>SpionCamp_Caesar</code> die Datei <code>package.bluej</code> öffnen.</p>
-   <p class="small">Das Projekt enthält drei Klassen: <code>Caesar</code> (hier programmiert ihr), <code>Beweismittel</code> (die abgefangenen Nachrichten) und <code>Pruefstand</code> (prüft eure Methoden).</p>
-   <details><summary>So ruft ihr eine Methode mit einem Beweisstück auf</summary><div class="inner">Rechtsklick auf <code>Caesar</code> → <code>new Caesar()</code>. Dann Rechtsklick auf das rote Objekt unten → <code>verschluesselnText</code>. Als Text tragt ihr <code>Beweismittel.NACHRICHT_2</code> ein, als k die Zahl <code>19</code>.</div></details>`;
- },
- haeufigkeit(el){
-  el.innerHTML = `<h3>Häufigkeitszähler</h3><textarea rows="5">${N3}</textarea><div class="bars"></div><div class="blab"></div><p class="small" id="mx"></p>`;
-  const ta = el.querySelector("textarea"), bars = el.querySelector(".bars");
-  el.querySelector(".blab").innerHTML = ABC.split("").map(c=>`<span>${c}</span>`).join("");
-  function upd(){
-    const cnt = Array(26).fill(0); for(const ch of ta.value.toUpperCase()){ const i = ch.charCodeAt(0)-65; if(i>=0&&i<26) cnt[i]++; }
-    const mx = Math.max(1,...cnt), mi = cnt.indexOf(Math.max(...cnt));
-    bars.innerHTML = cnt.map((c,i)=>`<div class="${i===mi&&c>0?"max":""}" style="height:${c/mx*100}%" title="${ABC[i]}: ${c}"></div>`).join("");
-    el.querySelector("#mx").textContent = cnt[mi] ? `Am häufigsten: ${ABC[mi]} (${cnt[mi]}-mal). Fahrt mit der Maus über einen Balken für die genaue Anzahl.` : "";
-  }
-  ta.oninput = upd; upd();
- },
- vigenere(el){
-  let h = `<h3>Vigenère-Quadrat</h3><p class="small">Klickt auf einen Buchstaben im Schlüssel (links), um seine Zeile zu markieren.</p><div class="scroll"><table class="vq"><tr><th></th>${ABC.split("").map(c=>`<th>${c}</th>`).join("")}</tr>`;
-  for(let r=0;r<26;r++){ h += `<tr data-r="${r}"><th style="cursor:pointer">${ABC[r]}</th>`; for(let c=0;c<26;c++) h += `<td>${ABC[(r+c)%26]}</td>`; h += `</tr>`; }
-  h += `</table></div><p class="small">Kopfzeile: Klartext. Linke Spalte: Schlüsselbuchstabe. Im Feld: Geheimtext.</p>`;
-  h += `<h3 style="margin-top:18px">Farbmisch-Experiment</h3><p class="small">Gelb ist öffentlich. Anna und Ben wählen je eine geheime Farbe. Nur die Mischungen gehen über das Netz, und Eve sieht sie.</p>
-   <div class="grid2"><div><b>Anna geheim:</b><div class="pal" id="pa"></div></div><div><b>Ben geheim:</b><div class="pal" id="pb"></div></div></div>
-   <div class="swrow" id="mixes" style="margin-top:10px"></div>`;
-  el.innerHTML = h;
-  el.querySelectorAll("tr[data-r] th").forEach(th => th.onclick = () => { el.querySelectorAll("td.hl").forEach(t=>t.classList.remove("hl")); th.parentElement.querySelectorAll("td").forEach(t=>t.classList.add("hl")); });
-  const G = [235,200,40], PAL = [[200,40,40],[40,90,200],[40,150,70],[140,50,160],[240,120,30],[30,170,180],[120,80,40],[230,90,150]];
-  let a = 1, b = 4;
-  const mix = (...cs) => { const r=[0,0,0]; cs.forEach(c=>{for(let i=0;i<3;i++) r[i]+=c[i];}); return `rgb(${r.map(x=>Math.round(x/cs.length)).join(",")})`; };
-  const sw = (col, lab) => `<div><span class="swatch" style="background:${col}"></span><br>${lab}</div>`;
-  function pal(id, get, set){ const p = el.querySelector(id); p.innerHTML = PAL.map((c,i)=>`<button style="background:rgb(${c})" class="${i===get()?"sel":""}" data-i="${i}" aria-label="Farbe ${i+1}"></button>`).join(""); p.querySelectorAll("button").forEach(bt => bt.onclick = () => { set(+bt.dataset.i); draw(); }); }
-  function draw(){
-    pal("#pa", ()=>a, v=>a=v); pal("#pb", ()=>b, v=>b=v);
-    const A = PAL[a], B = PAL[b];
-    el.querySelector("#mixes").innerHTML =
-      sw(`rgb(${G})`, "Gelb (öffentlich)") + sw(mix(G,A), "Anna schickt:<br>Gelb + Anna") + sw(mix(G,B), "Ben schickt:<br>Gelb + Ben") +
-      sw(mix(G,B,A), "Anna mischt ihre Farbe dazu") + sw(mix(G,A,B), "Ben mischt seine Farbe dazu") + sw(mix(G,A,G,B), "Eve mischt die beiden Mischungen");
-  }
-  draw();
- },
- signatur(el){
-  el.innerHTML = `<h3>Zwei Mails, angeblich von der Schulleitung</h3>
-   <div class="grid2">
-    <div class="mail"><div class="hd">Von: schulleitung@schule-intern.de · Fr 15:10<br>Betreff: Termine Dezember</div>Liebe Kolleginnen und Kollegen, anbei die Termine für Dezember. Die Zeugniskonferenzen beginnen am 15.12.<br><span class="small">🔏 digital signiert</span><div class="out1"></div></div>
-    <div class="mail"><div class="hd">Von: schulleitung@schule-intern.de · Fr 15:12<br>Betreff: DRINGEND: neues Notenportal</div>Liebe Kolleginnen und Kollegen, wegen der Störung muss jede Lehrkraft ihr Passwort im neuen Portal bestätigen: notenportal-schule-intern.de<br><span class="small">🔏 digital signiert</span><div class="out2"></div></div>
-   </div>
-   <p><b>Mit welchem Schlüssel prüft ihr die Signaturen?</b></p>
-   <div id="keys"></div>
-   <h3 style="margin-top:18px">Die beiden Zertifikate</h3>
-   <div class="grid2">
-    <div class="certbox"><b>Portal A</b> (WLAN der Schule)<table><tr><td>Ausgestellt für</td><td>notenportal.schule-intern.de</td></tr><tr><td>Ausgestellt von</td><td>Zertifizierungsstelle (im Browser hinterlegt)</td></tr><tr><td>Öffentlicher Schlüssel</td><td class="mono">…8F3A 21C7…</td></tr><tr><td>Browser</td><td>🔒 Verbindung ist sicher</td></tr></table></div>
-    <div class="certbox"><b>Portal B</b> (WLAN SCHULE GAST)<table><tr><td>Ausgestellt für</td><td>notenportal-schule-intern.de</td></tr><tr><td>Ausgestellt von</td><td>K. Brandt IT-Service</td></tr><tr><td>Öffentlicher Schlüssel</td><td class="mono">…04BE 9D12…</td></tr><tr><td>Browser</td><td>⚠ Warnung: Zertifikat nicht vertrauenswürdig (selbst signiert)</td></tr></table></div>
-   </div>
-   <p><b>Was verrät Portal B?</b></p><div id="cq"></div>`;
-  const keys = [["privater Schlüssel der Schulleitung", false, "Den hat nur die Schulleitung selbst. Mit ihm wird signiert, nicht geprüft."],
-                ["öffentlicher Schlüssel der Schulleitung", true, ""],
-                ["öffentlicher Schlüssel der Empfänger", false, "Damit verschlüsselt man Nachrichten an die Empfänger. Für die Signatur der Schulleitung hilft er nicht."]];
-  const kd = el.querySelector("#keys");
-  shuffle(keys).forEach(([t, ok, why]) => { const b = $(`<button class="opt">${t}</button>`); b.onclick = () => {
-    kd.querySelectorAll(".opt").forEach(x=>x.classList.remove("bad"));
-    if(ok){ b.classList.add("good");
-      el.querySelector(".out1").innerHTML = `<div class="fb ok">Signatur gültig: Die Mail stammt von der Schulleitung und wurde nicht verändert.</div>`;
-      el.querySelector(".out2").innerHTML = `<div class="fb err">Signatur ungültig: Die Mail wurde nicht mit dem privaten Schlüssel der Schulleitung signiert. Fälschung!</div>`;
-    } else { b.classList.add("bad"); b.innerHTML = t + `<br><span class="small">${why}</span>`; }
-  }; kd.append(b); });
-  const cq = el.querySelector("#cq");
-  const opts = [["Der Absender hat sein Zertifikat selbst unterschrieben. Niemand bestätigt, dass der öffentliche Schlüssel zum echten Notenportal gehört.", true],
-                ["Portal B ist sicher, weil die Verbindung verschlüsselt ist.", false],
-                ["Portal B ist echt, weil die Adresse fast gleich aussieht.", false]];
-  shuffle(opts).forEach(([t, ok]) => { const b = $(`<button class="opt">${t}</button>`); b.onclick = () => { b.classList.add(ok?"good":"bad"); }; cq.append(b); });
- },
- finale(el){
-  const STEPS = ["Die Täter lesen das WLAN-Passwort vom Klebezettel im Lehrerzimmer ab.",
-                 "Im Lehrerzimmer wird ein eigenes WLAN mit dem Namen SCHULE GAST aufgebaut.",
-                 "Eine gefälschte Mail lockt die Lehrkräfte auf ein falsches Notenportal.",
-                 "Lehrkräfte im falschen WLAN klicken die Zertifikatswarnung weg.",
-                 "Als Man-in-the-Middle lesen die Täter die eingegebenen Passwörter mit.",
-                 "Am Wochenende melden sich die Täter mit den Konten am Notenserver an."];
-  el.innerHTML = `<h3>1. Den Angriff rekonstruieren</h3><p class="small">Klickt die Schritte in der richtigen Reihenfolge an.</p><div id="ord"></div><div id="ordres"></div>
-   <h3 style="margin-top:18px">2. Wer war es?</h3><div id="sus"></div><div id="susres"></div>
-   <h3 style="margin-top:18px">3. Abschlussquiz</h3><div id="quiz"></div>`;
-  let pos = 0; const ord = el.querySelector("#ord");
-  shuffle(STEPS.map((s,i)=>[s,i])).forEach(([s,i]) => { const b = $(`<button class="opt"><span class="step"><span class="num"></span><span>${s}</span></span></button>`); b.onclick = () => {
-    if(b.classList.contains("good")) return;
-    if(i===pos){ b.classList.add("good"); b.querySelector(".num").textContent = (pos+1)+"."; pos++; if(pos===6) el.querySelector("#ordres").innerHTML = `<div class="fb ok">Richtig rekonstruiert. Markiert in eurem Sicherheitskonzept, an welcher Stelle welche Maßnahme den Angriff gestoppt hätte.</div>`; }
-    else { shakeEl(b); }
-  }; ord.append(b); });
-  const SUS = [["Dr. S. Lenz, Referentin der Fortbildung", "Sie war am Freitag im Lehrerzimmer, aber nur bis 12 Uhr. Das falsche WLAN und die Mails kamen erst am Nachmittag."],
-               ["PrintPro, Wartung des Kopierers", "Der Techniker war nur in Raum 104 und nicht im Lehrerzimmer."],
-               ["K. Brandt IT-Service, ehemaliger IT-Dienstleister", ""],
-               ["Unbekannter Nachbar mit offenem WLAN", "Das WLAN SCHULE GAST wurde im Lehrerzimmer aufgebaut, nicht von außen."]];
-  const sd = el.querySelector("#sus");
-  SUS.forEach(([t, why]) => { const b = $(`<button class="opt">${t}</button>`); b.onclick = () => {
-    if(!why){ b.classList.add("good"); S.solved[6] = true; save(); header();
-      el.querySelector("#susres").innerHTML = `<div class="fb ok"><b>Überführt.</b> Das gefälschte Zertifikat trägt den Namen K. Brandt IT-Service, und laut Besucherliste war die Firma am Freitag von 14:30 bis 15:20 Uhr im Lehrerzimmer, ohne Auftrag. Der Vertrag endete im Juli, das Wissen über das Schulnetz war aber noch da.</div>`; }
-    else { b.classList.add("bad"); b.innerHTML = t + `<br><span class="small">${why}</span>`; }
-  }; sd.append(b); });
-  quiz(el.querySelector("#quiz"));
- }
+/* =====================================================================
+   Lücken für das Java-Labor (identisch mit BlueJ-Projekt)
+   ===================================================================== */
+const G = {
+ L1:{ph:"'?'", w:5, ok:["'A'","65"], show:"'A'", hints:["Aus dem Buchstaben soll eine Zahl von 0 bis 25 werden. 'A' soll 0 ergeben.","Welchen Buchstaben muss man von 'A' abziehen, damit 0 herauskommt?","Lösung: <code>'A'</code> (mit einfachen Anführungszeichen)."]},
+ L2:{ph:"0", w:3, ok:["k"], show:"k", hints:["Um wie viel soll die Nummer verschoben werden? Schaut auf die Parameter der Methode.","Lösung: <code>k</code>"]},
+ L3:{ph:"1", w:3, ok:["26"], show:"26", hints:["Nach Z (25) soll es bei A (0) weitergehen. Der Rest beim Teilen durch die Anzahl der Buchstaben macht genau das.","Wie viele Buchstaben hat das Alphabet?","Lösung: <code>26</code>"]},
+ L4:{ph:"0", w:14, ok:["text.length()"], show:"text.length()", hints:["Die Schleife soll so oft laufen, wie der Text Zeichen hat.","Die Länge eines Strings bekommt man mit einer Methode: <code>text.l...()</code>","Lösung: <code>text.length()</code>"]},
+ L5:{ph:"0", w:3, ok:["i"], show:"i", hints:["Das wievielte Zeichen soll in diesem Schleifendurchlauf gelesen werden?","Die Zählvariable der Schleife heißt <code>i</code>.","Lösung: <code>i</code>"]},
+ L6:{ph:"'?'", w:5, ok:["'Z'","90"], show:"'Z'", hints:["Ein Großbuchstabe liegt zwischen 'A' und …","Lösung: <code>'Z'</code>"]},
+ L7:{ph:"0", w:3, ok:["k"], show:"k", hints:["Mit welchem Schlüssel soll der Buchstabe verschoben werden?","Lösung: <code>k</code>"]},
+ L8:{ph:'""', w:8, ok:["zeichen"], show:"zeichen", hints:["Leerzeichen und andere Zeichen sollen unverändert in das Ergebnis.","Lösung: <code>zeichen</code>"]},
+ L9:{ph:"0", w:9, ok:["26-k","(26-k)%26","26-k%26"], show:"26 - k", hints:["Entschlüsseln heißt: zurückschieben. Man kann aber auch so weit vorwärts schieben, bis man einmal rundherum ist.","Wer um k verschoben hat, muss noch um … weiterschieben, um insgesamt 26 zu erreichen.","Lösung: <code>26 - k</code>"]},
+ L10:{ph:"0", w:3, ok:["25"], show:"25", hints:["Welcher ist der größte sinnvolle Schlüssel bei Caesar?","Lösung: <code>25</code>"]},
+ L11:{ph:'""', w:30, ok:["entschluesselnText(geheimtext,k)","this.entschluesselnText(geheimtext,k)"], show:"entschluesselnText(geheimtext, k)", hints:["Für jedes k soll der entschlüsselte Text ausgegeben werden. Dafür gibt es schon eine Methode.","Aufruf mit zwei Parametern: der Geheimtext und k.","Lösung: <code>entschluesselnText(geheimtext, k)</code>"]},
+ L12:{ph:"0", w:12, ok:["zeichen-'A'","zeichen-65"], show:"zeichen - 'A'", hints:["Für 'A' soll an Stelle 0 gezählt werden, für 'B' an Stelle 1 usw.","Genau wie in L1: Buchstabe minus …","Lösung: <code>zeichen - 'A'</code>"]}
 };
+const CODE_BASIS = ["public char verschluesseln(char c, int k) {\n    int nummer = c - ",{g:"L1"},";          // Buchstabe -> Zahl 0..25\n    int neueNummer = (nummer + ",{g:"L2"},") % ",{g:"L3"},";\n    return (char) ('A' + neueNummer);     // Zahl -> Buchstabe\n}"];
+const CODE_STANDARD = ["public String verschluesselnText(String text, int k) {\n    String ergebnis = \"\";\n    for (int i = 0; i < ",{g:"L4"},"; i++) {\n        char zeichen = text.charAt(",{g:"L5"},");\n        if (zeichen >= 'A' && zeichen <= ",{g:"L6"},") {\n            ergebnis = ergebnis + verschluesseln(zeichen, ",{g:"L7"},");\n        } else {\n            ergebnis = ergebnis + ",{g:"L8"},";\n        }\n    }\n    return ergebnis;\n}"];
+const CODE_EXPERTE = ["public String entschluesselnText(String geheimtext, int k) {\n    return verschluesselnText(geheimtext, ",{g:"L9"},");\n}\n\npublic void bruteForce(String geheimtext) {\n    for (int k = 1; k <= ",{g:"L10"},"; k++) {\n        System.out.println(\"k = \" + k + \": \" + ",{g:"L11"},");\n    }\n}\n\n// in zaehleBuchstaben:\n    anzahl[",{g:"L12"},"]++;"];
 
-/* ================= Abschlussquiz ================= */
+/* =====================================================================
+   Missionen
+   ===================================================================== */
+const M = [
+ {n:1, name:"Die abgefangene Nachricht", topic:"Fachbegriffe · Caesar von Hand · Kerckhoffs",
+  story:`<b>Montag, 7:40 Uhr.</b> Der Störfall im Schulnetz letzte Woche war kein Zufall. In den Protokollen des Notenservers stehen Anmeldungen vom Wochenende, mit den Konten von drei Lehrkräften. Keine der drei war online.<br><br>Euer Kurs ist ab jetzt das <b>Forensik-Team</b>. Findet heraus, wer es war, wie es passiert ist und wie die Schule es künftig besser macht.<br><br>Die erste Spur: eine verschlüsselte Chatnachricht aus dem Gast-WLAN.`,
+  evidence:`<span class="sys">[Firewall] Do 16:42  Gast-WLAN -> extern  Chat:</span>\n<span class="hot">${N1}</span>`,
+  heft:"Ins Heft: Fachbegriffe mit Beispiel aus dem Fall, Schlüssel k, Prinzip von Kerckhoffs in einem Satz (AB 4, Aufgabe 1).",
+  clue:"Die Täter kannten das WLAN-Passwort der Schule. Es hing auf einem Klebezettel am Bildschirm im Lehrerzimmer.",
+  steps:[
+   {t:"Fachbegriffe zuordnen", r(el, ok, solved){
+      el.append($(`<p>Bevor ihr loslegt: Ordnet jedem Begriff die passende Beschreibung aus dem Fall zu.</p>`));
+      const rows = [["Geheimtext","ZODQ SDVVZRUW JHIXQGHQ"],["Klartext","die lesbare Nachricht, die ihr sucht"],["Schlüssel","die Zahl k, um die jeder Buchstabe verschoben wird"],["Verfahren","Caesar: jeden Buchstaben um k Stellen im Alphabet verschieben"]];
+      const terms = rows.map(r=>r[0]);
+      const tb = $(`<table class="mt"><tr><th>Beschreibung</th><th style="width:38%">Begriff</th></tr></table>`); el.append(tb);
+      const sels = shuffle(rows).map(([term, desc]) => { const tr = $(`<table><tr><td>${desc}</td><td><select><option value="">wählen …</option>${terms.map(t=>`<option>${t}</option>`).join("")}</select></td></tr></table>`).querySelector("tr"); tb.querySelector("tbody").append(tr); const s = tr.querySelector("select"); if(solved){ s.value = term; s.disabled = true; } return [s, term]; });
+      const b = $(`<div class="row" style="margin-top:10px"><button class="btn">Prüfen</button></div>`); el.append(b);
+      if(solved){ b.querySelector("button").disabled = true; return; }
+      b.querySelector("button").onclick = () => { if(sels.every(([s,t]) => s.value === t)){ sels.forEach(([s])=>s.disabled=true); b.querySelector("button").disabled = true; ok(); } else { sels.forEach(([s,t]) => s.style.borderColor = s.value===t ? "var(--ok)" : "var(--red)"); fail(1); shakeEl(tb); } };
+   }},
+   {t:"Die Nachricht entschlüsseln", r(el, ok, solved){
+      el.append($(`<p>Dreht die innere Scheibe, bis die Nachricht Sinn ergibt. Tragt dann unter jeden Geheimtext-Buchstaben den Klartext-Buchstaben ein. Jedes richtige Wort wird grün.</p>`));
+      const g = $(`<div class="grid2"><div class="dw"></div><div class="bw"></div></div>`); el.append(g);
+      disc(g.querySelector(".dw"), 0);
+      g.querySelector(".bw").append($(`<p class="tag" style="margin-top:8px">Werkbank</p>`));
+      bench(g.querySelector(".bw"), 1, N1, P1, solved, ok);
+      hints(el, 1, "m1s2", ["Sucht den Geheimtext-Buchstaben <b>innen</b> (rot) und lest <b>außen</b> den Klartext ab. Das erste Wort hat vier Buchstaben und hat mit dem Schulnetz zu tun.","Das erste Wort beginnt mit W. Stellt die Scheibe so ein, dass innen ein Z neben dem äußeren W steht.","Der Schlüssel ist k = 3."]);
+   }},
+   {t:"Ist ein geheimes Verfahren sicher?", r(el, ok, solved){
+      el.append($(`<p>In einer weiteren Nachricht schreiben die Täter: <i>„Keiner weiß, wie wir verschlüsseln. Also sind wir sicher.“</i></p>`));
+      mc(el, 1, "Was sagt das Prinzip von Kerckhoffs dazu?", [
+        ["Das stimmt nicht: Die Sicherheit darf nur von der Geheimhaltung des Schlüssels abhängen. Das Verfahren wird früher oder später bekannt.", true, "Genau. Bei Caesar gibt es außerdem nur 25 Schlüssel, die man schnell ausprobieren kann."],
+        ["Das stimmt: Ein geheimes Verfahren kann niemand knacken.", false, "Verfahren werden immer irgendwann bekannt, zum Beispiel durch ein Gespräch, ein Programm oder einen Mitwisser."],
+        ["Das stimmt nur, wenn der Schlüssel öffentlich ist.", false, "Der Schlüssel muss gerade geheim bleiben."]], solved, ok);
+   }}
+  ]},
+ {n:2, name:"Das Java-Labor", topic:"Caesar in BlueJ programmieren · Lückentext",
+  story:`Die Spurensicherung findet im Chatprotokoll vom Freitag eine lange Nachricht, und es werden noch mehr kommen. Von Hand dauert das zu lange. Ihr baut euch ein eigenes Werkzeug: ein Java-Programm, das Caesar ver- und entschlüsselt.<br><br>Auf einem Notizzettel im Papierkorb des Lehrerzimmers stand: <b>k = 7</b>.`,
+  evidence:`<span class="sys">[Chatprotokoll] Fr 11:58  Gast-WLAN -> extern:</span>\n<span class="hot">${N2}</span>`,
+  heft:"Ins Heft: Erklärt in zwei bis drei Sätzen, was die Zeile mit % 26 macht und warum sie nötig ist.",
+  clue:"Am Freitag haben die Täter im Lehrerzimmer ein eigenes WLAN mit dem Namen SCHULE GAST aufgebaut. Es sieht aus wie das echte Gast-WLAN.",
+  intro:`<div class="dark"><span class="tag">Ausrüstung</span><h3>BlueJ-Projekt</h3>
+    <p class="row"><a class="btn amber" href="SpionCamp_Caesar.zip" download>⬇ BlueJ-Projekt herunterladen</a></p>
+    <p class="small" style="color:#cfdcda">In BlueJ: <b>Projekt → ZIP/JAR öffnen …</b> und die Datei wählen. Oder die ZIP-Datei entpacken und <code>package.bluej</code> öffnen.<br>So arbeitet ihr: Jede Lücke zuerst <b>hier auf der Seite</b> ausfüllen und prüfen. Dann dasselbe in BlueJ eintragen: Dort steht an der Stelle ein Platzhalter mit dem Kommentar <code>/* L1 */</code>, <code>/* L2 */</code> usw. Den Platzhalter ersetzt ihr.</p></div>`,
+  steps:[
+   {t:"Wie rechnet Java mit Buchstaben?", r(el, ok, solved){
+      el.append($(`<p>Für Java ist ein <code>char</code> eigentlich eine Zahl. Darum kann man mit Buchstaben rechnen. Wählt einen Buchstaben und einen Schlüssel und schaut zu, was die Methode <code>verschluesseln</code> Schritt für Schritt macht.</p>`));
+      const ctl = $(`<div class="row"><label>Buchstabe c <select class="c">${ABC.split("").map(x=>`<option ${x==="X"?"selected":""}>${x}</option>`).join("")}</select></label><label>Schlüssel k <select class="k">${Array.from({length:26},(_,i)=>`<option ${i===5?"selected":""}>${i}</option>`).join("")}</select></label></div>`);
+      const pp = $(`<div class="pipe"></div>`); el.append(ctl, pp);
+      const draw = () => { const c = ctl.querySelector(".c").value, k = +ctl.querySelector(".k").value, nr = c.charCodeAt(0)-65, s = nr+k, m = s%26;
+        pp.innerHTML = `<div class="box"><b>'${c}'</b><span>c</span></div><div class="arr">c - 'A'<br>→</div><div class="box"><b>${nr}</b><span>nummer</span></div><div class="arr">+ k<br>→</div><div class="box"><b>${s}</b><span>nummer + ${k}</span></div><div class="arr">% 26<br>→</div><div class="box" style="${s>25?"border-color:var(--amber)":""}"><b>${m}</b><span>neueNummer</span></div><div class="arr">'A' + …<br>→</div><div class="box" style="border-color:var(--red)"><b>'${ABC[m]}'</b><span>Ergebnis</span></div>`; };
+      ctl.querySelectorAll("select").forEach(s => s.onchange = draw); draw();
+      el.append($(`<p class="small">Probiert X mit k = 5: Ohne <code>% 26</code> käme 28 heraus, und das ist kein Buchstabe mehr. Der Rest beim Teilen durch 26 fängt wieder bei 0 an.</p>`));
+      ask(el, 2, "Kontrollfrage: Welche Zahl ergibt 'Z' - 'A'?", a => a.trim()==="25", solved, ok, "Zahl");
+   }},
+   {t:"Stufe Basis: einen Buchstaben verschlüsseln (L1 bis L3)", r(el, ok, solved){
+      el.append($(`<p>Füllt die gelben Lücken. Zu jeder Lücke gibt es mit <b>?</b> eine Hilfe, beim zweiten Klick eine genauere. Dann in BlueJ eintragen und mit Rechtsklick auf <code>Pruefstand</code> → <code>pruefeBasis()</code> testen.</p>`));
+      gapCode(el, 2, CODE_BASIS, G, () => solved, ok);
+   }},
+   {t:"Stufe Standard: einen ganzen Text verschlüsseln (L4 bis L8)", r(el, ok, solved){
+      el.append($(`<p>Jetzt geht die Methode den Text Zeichen für Zeichen durch. Großbuchstaben werden verschoben, alles andere bleibt, wie es ist. Danach in BlueJ: <code>pruefeStandard()</code>.</p>`));
+      gapCode(el, 2, CODE_STANDARD, G, () => solved, ok);
+   }},
+   {t:"Die Nachricht vom Freitag entschlüsseln", r(el, ok, solved){
+      el.append($(`<p>Benutzt euer Programm in BlueJ: Rechtsklick auf <code>Caesar</code> → <code>new Caesar()</code>, dann Rechtsklick auf das rote Objekt → <code>verschluesselnText</code>. Als Text tragt ihr <code>Beweismittel.NACHRICHT_2</code> ein.</p><p>Aber Vorsicht: Die Nachricht wurde mit k = 7 <b>verschlüsselt</b>. Um sie zurückzuholen, verschiebt ihr so weit weiter, bis ihr einmal rundherum seid: <b>26 − 7 = 19</b>.</p>`));
+      ask(el, 2, "Unter welchem Namen haben die Täter ihr eigenes WLAN aufgebaut?", a => norm(a).includes("SCHULEGAST"), solved, ok, "Name des WLANs");
+      hints(el, 2, "m2s4", ["Klappt euer Programm noch nicht? Prüft zuerst mit <code>pruefeBasis()</code> und <code>pruefeStandard()</code>, ob alle Lücken in BlueJ richtig eingetragen sind.","Notfalls geht es auch mit der Chiffrierscheibe aus Mission 1: Der Name des WLANs steht in den letzten drei Wörtern."]);
+   }}
+  ],
+  after(el){
+   const box = $(`<div class="step"><div class="shead"><span class="snum">★</span><span class="stitle">Expertenlabor (freiwillig): entschlüsseln, Brute Force, Zählen (L9 bis L12)</span></div></div>`); el.append(box);
+   box.append($(`<p>Für alle, die schneller sind. Danach in BlueJ: <code>pruefeExperte()</code>. Mit <code>bruteForce</code> knackt ihr die zweite Freitagsnachricht, deren Schlüssel niemand kennt.</p>`));
+   gapCode(box, 2, CODE_EXPERTE, G, () => S.java.e, () => { S.java.e = true; save(); box.append($(`<div class="fb ok pop">Expertenstufe gelöst. Jetzt <code>bruteForce(Beweismittel.NACHRICHT_2_EXPERTE)</code> in BlueJ aufrufen.</div>`)); });
+   const ev = $(`<div class="evidence"><span class="sys">[Chatprotokoll] Fr 12:03  Schlüssel unbekannt:</span>\n<span class="hot">${N2X}</span></div>`); box.append(ev);
+   ask(box, 2, "Expertenspur: Was steht in der zweiten Nachricht?", a => norm(a)==="LEHRKRAEFTEKLICKENJEDEZERTIFIKATSWARNUNGWEG", S.extra, () => { S.extra = true; save(); box.append($(`<div class="fb ok pop"><b>Neue Spur:</b> Die Täter verlassen sich darauf, dass Lehrkräfte Zertifikatswarnungen im Browser wegklicken.</div>`)); });
+  }},
+ {n:3, name:"Angriff auf Caesar", topic:"Brute Force · Häufigkeitsanalyse · Vigenère",
+  story:`Am Samstag schicken die Täter eine lange Nachricht, und diesmal gibt es keinen Notizzettel. Der Schlüssel ist unbekannt. Zeit für einen echten Angriff. Ihr knackt Caesar auf zwei Arten und vergleicht sie.`,
+  evidence:`<span class="sys">[Chatprotokoll] Sa 20:14  über Schulserver:</span>\n<span class="hot">${N3}</span>`,
+  heft:"Ins Heft: Brute Force und Häufigkeitsanalyse kurz erklären und vergleichen. Warum hilft die Häufigkeitsanalyse bei Vigenère kaum? (AB 4, Aufgaben 2, 3 und 6)",
+  clue:"Die Täter wechseln auf das Vigenère-Verfahren. Den Schlüssel schicken sie sich per Mail.",
+  steps:[
+   {t:"Brute Force: alle Schlüssel ausprobieren", r(el, ok, solved){
+      ask(el, 3, "Wie viele Schlüssel muss man bei Caesar höchstens ausprobieren?", a => a.trim()==="25", solved || stepDone(3,0) || S.ui.m3a, () => { S.ui.m3a = true; save(); show(); }, "Anzahl");
+      const area = $(`<div></div>`); el.append(area);
+      function show(){
+        area.innerHTML = `<p>Die Brute-Force-Maschine probiert alle 25 Schlüssel an den ersten Wörtern aus. Sucht die Zeile, die Sinn ergibt.</p>`;
+        const pre = $(`<div class="evidence" style="max-height:300px;overflow:auto"></div>`); area.append(pre);
+        const start = N3.split(" ").slice(0,3).join(" ");
+        let s = ""; for(let k=1;k<=25;k++) s += `<span class="sys">k = ${String(k).padStart(2," ")}:</span> ${caesar(start, -k)}\n`; pre.innerHTML = s;
+        ask(area, 3, "Mit welchem Schlüssel k wurde verschlüsselt?", a => a.trim().replace(/^k\s*=\s*/i,"")==="11", solved, ok, "k");
+      }
+      if(solved || S.ui.m3a) show();
+   }},
+   {t:"Häufigkeitsanalyse: ohne alles auszuprobieren", r(el, ok, solved){
+      el.append($(`<p>Bei langen Texten geht es auch schlauer. Im Deutschen ist <b>E</b> fast immer der häufigste Buchstabe. Caesar ersetzt jedes E immer durch denselben Buchstaben, und genau das verrät den Schlüssel.</p>`));
+      const ta = $(`<textarea rows="4" spellcheck="false">${N3}</textarea>`); el.append(ta);
+      const bars = $(`<div style="display:flex;align-items:flex-end;gap:2px;height:150px;border-bottom:1px solid var(--ink2);margin-top:10px"></div>`), lab = $(`<div style="display:flex;gap:2px;font:12px var(--mono)">${ABC.split("").map(c=>`<span style="flex:1;text-align:center">${c}</span>`).join("")}</div>`);
+      el.append(bars, lab);
+      const upd = () => { const cnt = Array(26).fill(0); for(const ch of ta.value.toUpperCase()){ const i = ch.charCodeAt(0)-65; if(i>=0&&i<26) cnt[i]++; } const mx = Math.max(1,...cnt);
+        bars.innerHTML = cnt.map((c,i)=>`<div title="${ABC[i]}: ${c}" style="flex:1;height:${c/mx*100}%;background:${c===mx?"var(--amber)":"var(--petrol)"};border-radius:3px 3px 0 0;position:relative">${c===mx?`<span style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);font:600 11px var(--mono)">${c}</span>`:""}</div>`).join(""); };
+      ta.oninput = upd; upd();
+      const rest = $(`<div></div>`);
+      ask(el, 3, "Welcher Buchstabe kommt im Geheimtext am häufigsten vor?", a => norm(a)==="P", solved || S.ui.m3b, () => { S.ui.m3b = true; save(); more(); }, "Buchstabe");
+      el.append(rest);
+      function more(){
+      rest.append($(`<p class="small">Rechnung: Wenn P für E steht, dann ist k der Abstand von E bis P im Alphabet. E hat die Nummer 4, P die Nummer 15. Passt das zur Brute-Force-Maschine?</p>`));
+      mc(rest, 3, "Was ist bei langen Texten der Vorteil der Häufigkeitsanalyse?", [
+        ["Man muss nicht alle Schlüssel durchprobieren und lesen. Ein Blick auf den häufigsten Buchstaben genügt.", true, ""],
+        ["Sie funktioniert auch, wenn der Text sehr kurz ist.", false, "Bei kurzen Texten ist die Verteilung oft zufällig. Dann ist Brute Force sicherer."],
+        ["Sie findet den Schlüssel auch bei jedem anderen Verfahren.", false, "Nur wenn jeder Buchstabe immer gleich ersetzt wird, bleiben die Häufigkeiten erhalten."]], solved, ok);
+      }
+      if(solved || S.ui.m3b) more();
+   }},
+   {t:"Was planen die Täter?", r(el, ok, solved){
+      el.append($(`<p>Mit k = 11 lautet die Nachricht:</p><div class="evidence">${caesar(N3,-11)}</div>`));
+      mc(el, 3, "Was ändern die Täter jetzt?", [
+        ["Sie wechseln auf Vigenère und schicken sich den Schlüssel per Mail.", true, ""],
+        ["Sie hören auf zu verschlüsseln.", false, ""],
+        ["Sie nutzen Caesar mit einem größeren Schlüssel.", false, "Bei Caesar gibt es keinen größeren Schlüssel: k = 27 ist dasselbe wie k = 1."]], solved, ok);
+   }},
+   {t:"Vigenère: Caesar mit wechselndem Schlüssel", r(el, ok, solved){
+      el.append($(`<p>Vigenère ist Caesar mit einem <b>Schlüsselwort</b>. Jeder Buchstabe des Schlüsselworts gibt eine eigene Verschiebung an: A = 0, B = 1, C = 2 … Das Wort wird immer wiederholt.</p>
+       <div class="pipe"><div class="box"><b>A N A N A S</b><span>Klartext</span></div><div class="arr">+<br></div><div class="box"><b>K E Y K E Y</b><span>Schlüssel wiederholt</span></div><div class="arr">=<br></div><div class="box" style="border-color:var(--red)"><b>? ? ? ? ? ?</b><span>Geheimtext</span></div></div>
+       <p class="small">K = 10, E = 4, Y = 24. Also: A + 10, N + 4, A + 24, N + 10, A + 4, S + 24.</p>`));
+      const rest = $(`<div></div>`);
+      ask(el, 3, "Wie lautet ANANAS mit dem Schlüssel KEY verschlüsselt?", a => norm(a)==="KRYXEQ", solved || S.ui.m3d, () => { S.ui.m3d = true; save(); more(); }, "Geheimtext");
+      hints(el, 3, "m3s4", ["A + 10 = K, N + 4 = R. Weiter geht es mit A + 24.","Bei A + 24 landet ihr bei Y. N + 10 = X."]);
+      el.append(rest);
+      function more(){
+      mc(rest, 3, "Schaut auf euer Ergebnis: Das A wurde einmal zu K und einmal zu Y. Was bedeutet das für die Häufigkeitsanalyse?", [
+        ["Sie klappt nicht mehr so einfach, weil derselbe Buchstabe zu verschiedenen Buchstaben wird.", true, "Genau. Das Muster der Häufigkeiten wird verwischt."],
+        ["Sie wird einfacher, weil der Geheimtext länger ist.", false, "Der Geheimtext ist genauso lang wie der Klartext."],
+        ["Nichts, sie funktioniert genauso wie bei Caesar.", false, "Bei Caesar wird jedes A immer zum selben Buchstaben. Bei Vigenère nicht."]], solved, ok);
+      }
+      if(solved || S.ui.m3d) more();
+   }}
+  ]},
+ {n:4, name:"Das Schlüsselproblem", topic:"Vigenère · Schlüsselaustausch · Farbmisch-Experiment",
+  story:`Im Protokoll des Mailservers findet ihr eine Mail vom Samstagabend. Sie ist <b>nicht verschlüsselt</b> und enthält nur ein Wort. Eine halbe Stunde später wird eine Vigenère-Nachricht abgefangen.`,
+  evidence:`<span class="sys">[Mailserver] Sa 21:02  Betreff: (leer)  unverschlüsselt</span>\n<span class="hot">${K4}</span>\n\n<span class="sys">[Chatprotokoll] Sa 21:30  Vigenère:</span>\n<span class="hot">${N4}</span>`,
+  heft:"Ins Heft: Das Schlüsselaustauschproblem in eigenen Worten. Formel n · (n − 1) / 2 mit Begründung. Farbmisch-Experiment als Skizze (AB 4, Aufgabe 7; AB 5, Aufgaben 1 und 4).",
+  clue:"Die Täter betreiben ein gefälschtes Anmeldeportal, das wie das Notenportal der Schule aussieht.",
+  steps:[
+   {t:"Die Vigenère-Nachricht entschlüsseln", r(el, ok, solved){
+      el.append($(`<p>Über jedem Buchstaben steht, welcher Buchstabe des Schlüssels ROUTER dort gilt und um wie viel verschoben wurde. Zurück rechnet ihr wie bei Caesar: Stellt die Scheibe auf diese Verschiebung, sucht den Buchstaben innen und lest außen ab.</p>`));
+      const g = $(`<div class="grid2"><div class="dw"></div><div class="bw"></div></div>`); el.append(g);
+      disc(g.querySelector(".dw"), 17);
+      g.querySelector(".bw").append($(`<p class="tag" style="margin-top:8px">Werkbank</p>`));
+      bench(g.querySelector(".bw"), 4, N4, P4, solved, ok, (i) => { const kc = K4[i%6]; return `${kc}<small>k=${kc.charCodeAt(0)-65}</small>`; });
+      hints(el, 4, "m4s1", ["Erster Buchstabe: Über dem W steht R mit k = 17. Stellt die Scheibe auf 17, sucht innen das W und lest außen ab.","Die ersten beiden Buchstaben sind F und A. Das erste Wort beschreibt etwas, das nicht echt ist."]);
+   }},
+   {t:"Der Fehler der Täter", r(el, ok, solved){
+      el.append($(`<p>Vigenère ist viel stärker als Caesar. Trotzdem konntet ihr die Nachricht in wenigen Minuten lesen.</p>`));
+      let partA = solved || S.ui.m4a;
+      const holder = $(`<div></div>`), rest = $(`<div></div>`); el.append(holder, rest);
+      mc(holder, 4, "Warum konntet ihr mitlesen?", [
+        ["Der Schlüssel ging unverschlüsselt per Mail über das Netz. Wer den Schlüssel hat, kann jedes symmetrische Verfahren lesen.", true, "Genau das ist das Schlüsselaustauschproblem: Sender und Empfänger brauchen denselben Schlüssel, aber wie kommt er sicher zum anderen?"],
+        ["Vigenère ist genauso schwach wie Caesar.", false, "Ohne Schlüssel ist Vigenère deutlich schwerer zu knacken. Ihr hattet aber den Schlüssel."],
+        ["Das Schlüsselwort ROUTER war zu kurz.", false, "Ein längerer Schlüssel hätte nichts genützt, er stand ja im Klartext in der Mail."]], partA, () => { S.ui.m4a = true; save(); graph(); });
+      function graph(){
+        rest.innerHTML = "";
+        rest.append($(`<p style="margin-top:14px">Die sichere Lösung wäre: Schlüssel nur persönlich austauschen. Aber wie viele Schlüssel braucht man, wenn <b>jede</b> Person mit <b>jeder</b> anderen geheim schreiben will? Schiebt den Regler.</p>`));
+        const gr = $(`<div class="graph"><svg width="220" height="220" viewBox="-110 -110 220 220"></svg><div><input type="range" min="2" max="10" value="4"><p class="mono" style="font-size:18px"></p></div></div>`); rest.append(gr);
+        const svg = gr.querySelector("svg"), rg = gr.querySelector("input"), out = gr.querySelector("p");
+        const draw = () => { const n = +rg.value; let s = ""; const pts = Array.from({length:n},(_,i)=>{ const a = i*2*Math.PI/n - Math.PI/2; return [90*Math.cos(a), 90*Math.sin(a)]; });
+          for(let i=0;i<n;i++) for(let j=i+1;j<n;j++) s += `<line x1="${pts[i][0]}" y1="${pts[i][1]}" x2="${pts[j][0]}" y2="${pts[j][1]}" stroke="#f0b040" stroke-width="2"/>`;
+          pts.forEach(([x,y],i) => s += `<circle cx="${x}" cy="${y}" r="12" fill="#1f7a84"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" fill="#fff" font-family="IBM Plex Mono">${i+1}</text>`);
+          svg.innerHTML = s; out.innerHTML = `${n} Personen<br><b>${n*(n-1)/2} Schlüssel</b><br><span class="small">jede Linie = ein Schlüssel</span>`; };
+        rg.oninput = draw; draw();
+        rest.append($(`<p class="small">Jede der n Personen braucht einen Schlüssel zu den n − 1 anderen. Dabei zählt man jeden Schlüssel doppelt, darum: n · (n − 1) / 2.</p>`));
+        ask(rest, 4, "Unser Kurs hat 20 Personen. Wie viele Schlüssel braucht ihr?", a => a.trim()==="190", solved, ok, "Anzahl");
+      }
+      if(partA) graph();
+   }},
+   {t:"Die Idee: ein Geheimnis vereinbaren, ohne es zu verschicken", r(el, ok, solved){
+      el.append($(`<p>Persönliche Treffen klappen im Internet nicht. Es gibt einen erstaunlichen Trick: Anna und Ben können sich auf ein gemeinsames Geheimnis einigen, <b>obwohl Eve alles mitliest</b>. Wir spielen das mit Farben durch.</p>`));
+      const G0 = [235,200,40], PAL = [[200,40,40],[40,90,200],[40,150,70],[140,50,160],[240,120,30],[30,170,180],[120,80,40],[230,90,150]];
+      let a = S.ui.ca ?? 1, b = S.ui.cb ?? 4, phase = solved ? 4 : (S.ui.ph || 0);
+      const mix = (...cs) => { const r=[0,0,0]; cs.forEach(c=>{for(let i=0;i<3;i++) r[i]+=c[i];}); return `rgb(${r.map(x=>Math.round(x/cs.length)).join(",")})`; };
+      const sw = (col, lab) => `<span class="swatch pop" style="background:${col}"></span><span>${lab}</span>`;
+      const box = $(`<div></div>`); el.append(box);
+      const TXT = ["<b>1. Öffentliche Farbe:</b> Anna und Ben einigen sich offen auf Gelb. Eve hört das mit.",
+                   "<b>2. Geheime Farben:</b> Jeder wählt heimlich eine eigene Farbe und verrät sie niemandem. Wählt unten für Anna und Ben.",
+                   "<b>3. Mischen und verschicken:</b> Jeder mischt Gelb mit seiner geheimen Farbe und schickt die Mischung über das Netz. Eve sieht beide Mischungen.",
+                   "<b>4. Eigene Farbe dazu:</b> Anna mischt ihre geheime Farbe in Bens Mischung, Ben seine in Annas. Beide haben jetzt dieselbe Farbe: das gemeinsame Geheimnis.",
+                   "<b>Und Eve?</b> Sie hat Gelb und beide Mischungen. Wenn sie die beiden Mischungen zusammenkippt, ist zu viel Gelb drin. Und eine Mischung wieder in ihre Farben zu trennen, ist praktisch unmöglich."];
+      function draw(){
+        const A = PAL[a], B = PAL[b];
+        box.innerHTML = `<div class="fb info">${TXT[Math.min(phase,4)]}</div>
+          ${phase>=1 ? `<div class="grid2" style="margin-top:8px"><div><b>Anna wählt geheim:</b><div class="pal pa"></div></div><div><b>Ben wählt geheim:</b><div class="pal pb"></div></div></div>` : ""}
+          <div class="dh"><div class="who">ANNA</div><div class="who">NETZ</div><div class="who">BEN</div>
+           <div class="cell">${phase>=1 ? sw(`rgb(${A})`,"geheim") : ""}</div><div class="cell mid">${sw(`rgb(${G0})`,"Gelb (öffentlich)")}</div><div class="cell">${phase>=1 ? sw(`rgb(${B})`,"geheim") : ""}</div>
+           <div class="cell">${phase>=2 ? sw(mix(G0,A),"Gelb + Anna") : ""}</div><div class="cell mid">${phase>=2 ? "⇄<br>wird verschickt" : ""}</div><div class="cell">${phase>=2 ? sw(mix(G0,B),"Gelb + Ben") : ""}</div>
+           <div class="cell">${phase>=3 ? sw(mix(G0,B,A),"Bens Mischung + Anna") : ""}</div><div class="cell mid">${phase>=3 ? "gleich!" : ""}</div><div class="cell">${phase>=3 ? sw(mix(G0,A,B),"Annas Mischung + Ben") : ""}</div></div>
+          ${phase>=4 ? `<div class="eve"><b>EVE</b> sieht: <span class="swatch" style="background:rgb(${G0});width:34px;height:34px"></span><span class="swatch" style="background:${mix(G0,A)};width:34px;height:34px"></span><span class="swatch" style="background:${mix(G0,B)};width:34px;height:34px"></span> → kippt beide Mischungen zusammen: <span class="swatch" style="background:${mix(G0,A,G0,B)};width:34px;height:34px"></span> <span>passt nicht!</span></div>` : ""}
+          <div class="row" style="margin-top:12px">${phase>0?`<button class="btn ghost small back">◀ zurück</button>`:""}${phase<4?`<button class="btn small fwd">weiter ▶</button>`:""}</div>`;
+        const pal = (sel, get, set) => { const p = box.querySelector(sel); if(!p) return; p.innerHTML = PAL.map((c,i)=>`<button style="background:rgb(${c})" class="${i===get()?"sel":""}" data-i="${i}" aria-label="Farbe ${i+1}"></button>`).join(""); p.querySelectorAll("button").forEach(bt => bt.onclick = () => { set(+bt.dataset.i); save(); draw(); }); };
+        pal(".pa", ()=>a, v=>{a=v; S.ui.ca=v;}); pal(".pb", ()=>b, v=>{b=v; S.ui.cb=v;});
+        const f = box.querySelector(".fwd"), bk = box.querySelector(".back");
+        if(f) f.onclick = () => { phase++; S.ui.ph = phase; save(); draw(); if(phase===4) quiz(); };
+        if(bk) bk.onclick = () => { phase--; draw(); };
+      }
+      const qbox = $(`<div></div>`); el.append(qbox);
+      let asked = false;
+      function quiz(){ if(asked) return; asked = true;
+        mc(qbox, 4, "Warum kann Eve das gemeinsame Geheimnis nicht herstellen?", [
+          ["Sie kennt keine der beiden geheimen Farben, und aus einer Mischung bekommt man die Farben nicht zurück.", true, "Genau. Mischen ist leicht, Entmischen ist praktisch unmöglich. In der Informatik nimmt man statt Farben Rechnungen, die nur in eine Richtung leicht sind. Das Verfahren heißt Diffie-Hellman."],
+          ["Weil Gelb geheim ist.", false, "Gelb ist öffentlich, Eve kennt es."],
+          ["Weil Anna und Ben ihre Mischungen verschlüsselt verschicken.", false, "Die Mischungen gehen offen über das Netz. Eve sieht sie."]], solved, ok);
+      }
+      draw(); if(phase>=4) quiz();
+   }}
+  ]},
+ {n:5, name:"Echt oder gefälscht?", topic:"Schlüsselpaar · Signatur · Man-in-the-Middle · Zertifikate",
+  story:`Freitag, 15:10 Uhr: Alle Lehrkräfte bekommen zwei Mails, beide angeblich von der Schulleitung. Eine davon führt zum gefälschten Portal. Wer im WLAN SCHULE GAST war, bekam beim Öffnen außerdem eine Zertifikatswarnung, und viele haben sie weggeklickt.<br><br>Prüft Mails und Zertifikate so, wie es ein Computer tut. Dafür braucht ihr ein neues Werkzeug: Schlüsselpaare.`,
+  evidence:null,
+  heft:"Ins Heft: Merktabelle „Wer nutzt welchen Schlüssel?“ abschreiben. Man-in-the-Middle-Angriff im WLAN SCHULE GAST als Skizze (AB 5, Aufgaben 2, 3 und 5).",
+  clue:"Das gefälschte Portal nutzt ein selbst signiertes Zertifikat. Ausgestellt von: K. Brandt IT-Service.",
+  steps:[
+   {t:"Das Schlüsselpaar: Schloss und Schlüssel", r(el, ok, solved){
+      const lock = (open, col) => `<svg width="56" height="64" viewBox="0 0 56 64"><path d="M14 30 V18 a14 14 0 0 1 28 0 ${open?"V12":"V30"}" fill="none" stroke="#2a2824" stroke-width="6" stroke-linecap="round"/><rect x="6" y="28" width="44" height="32" rx="6" fill="${col}"/><circle cx="28" cy="42" r="5" fill="#f5efe2"/><rect x="26" y="44" width="4" height="9" fill="#f5efe2"/></svg>`;
+      el.append($(`<p>Ben hat viele <b>offene Vorhängeschlösser</b>, die er an alle verteilt. Den einzigen <b>Schlüssel</b> dazu behält er für sich.</p>
+        <div class="locks"><div>${lock(true,"#1f7a84")}öffentlicher Schlüssel<br><span class="small">= Bens offenes Schloss, für alle</span></div><div><svg width="64" height="64" viewBox="0 0 64 64"><circle cx="18" cy="32" r="12" fill="none" stroke="#c43a2c" stroke-width="6"/><path d="M30 32 H58 M50 32 v10 M42 32 v8" stroke="#c43a2c" stroke-width="6" stroke-linecap="round"/></svg>privater Schlüssel<br><span class="small">= nur Ben hat ihn</span></div></div>
+        <p>Jeder kann eine Kiste mit Bens Schloss zuschnappen lassen. Öffnen kann sie nur Ben. Das Besondere: Der Schlüssel muss nie verschickt werden.</p>`));
+      mc(el, 5, "Anna will Ben eine geheime Nachricht schicken. Was benutzt sie?", [
+        ["Bens öffentlichen Schlüssel (sein offenes Schloss).", true, "Richtig. Öffnen kann die Kiste nur Ben mit seinem privaten Schlüssel."],
+        ["Bens privaten Schlüssel.", false, "Den hat nur Ben. Anna kommt da gar nicht dran."],
+        ["Ihren eigenen öffentlichen Schlüssel.", false, "Dann könnte nur Anna die Kiste wieder öffnen, nicht Ben."]], solved, ok);
+   }},
+   {t:"Merktabelle: Wer nutzt welchen Schlüssel?", r(el, ok, solved){
+      el.append($(`<p>Bei einer <b>digitalen Signatur</b> ist es genau umgekehrt: Anna „unterschreibt“ mit ihrem privaten Schlüssel, und alle können mit ihrem öffentlichen Schlüssel prüfen, dass die Nachricht wirklich von ihr ist. Füllt die Tabelle aus.</p>`));
+      const OPT = ["Bens öffentlicher Schlüssel","Bens privater Schlüssel","Annas öffentlicher Schlüssel","Annas privater Schlüssel"];
+      const R = [["Anna verschlüsselt eine Nachricht an Ben mit …","Bens öffentlicher Schlüssel"],["Ben entschlüsselt sie mit …","Bens privater Schlüssel"],["Anna signiert eine Nachricht mit …","Annas privater Schlüssel"],["Ben prüft Annas Signatur mit …","Annas öffentlicher Schlüssel"]];
+      const tb = $(`<table class="mt"><tr><th>Situation</th><th style="width:45%">Schlüssel</th></tr></table>`); el.append(tb);
+      const sels = R.map(([s,a]) => { const tr = $(`<table><tr><td>${s}</td><td><select><option value="">wählen …</option>${OPT.map(o=>`<option>${o}</option>`).join("")}</select></td></tr></table>`).querySelector("tr"); tb.querySelector("tbody").append(tr); const sel = tr.querySelector("select"); if(solved){ sel.value = a; sel.disabled = true; } return [sel,a]; });
+      const b = $(`<div class="row" style="margin-top:10px"><button class="btn">Prüfen</button></div>`); el.append(b);
+      if(solved){ b.querySelector("button").disabled = true; return; }
+      b.querySelector("button").onclick = () => { if(sels.every(([s,a]) => s.value === a)){ sels.forEach(([s])=>s.disabled=true); b.querySelector("button").disabled = true; ok(); } else { sels.forEach(([s,a]) => s.style.borderColor = s.value===a ? "var(--ok)" : "var(--red)"); fail(5); shakeEl(tb); } };
+      hints(el, 5, "m5s2", ["Verschlüsseln: Es soll nur der Empfänger lesen können. Signieren: Es soll nur der Absender erstellen können.","Wer etwas tut, das nur eine Person kann, braucht deren privaten Schlüssel."]);
+   }},
+   {t:"Die Mails prüfen", r(el, ok, solved){
+      el.append($(`<div class="grid2">
+        <div class="mail"><div class="hd">Von: schulleitung@schule-intern.de · Fr 15:10<br>Betreff: Termine Dezember</div>Liebe Kolleginnen und Kollegen, anbei die Termine für Dezember. Die Zeugniskonferenzen beginnen am 15.12.<br><span class="small">🔏 digital signiert</span><div class="o1"></div></div>
+        <div class="mail"><div class="hd">Von: schulleitung@schule-intern.de · Fr 15:12<br>Betreff: DRINGEND: neues Notenportal</div>Liebe Kolleginnen und Kollegen, wegen der Störung muss jede Lehrkraft ihr Passwort im neuen Portal bestätigen: notenportal-schule-intern.de<br><span class="small">🔏 digital signiert</span><div class="o2"></div></div></div>`));
+      const showRes = () => { el.querySelector(".o1").innerHTML = `<div class="fb ok">✓ Signatur gültig: von der Schulleitung, unverändert.</div>`; el.querySelector(".o2").innerHTML = `<div class="fb err">✗ Signatur ungültig: nicht mit dem privaten Schlüssel der Schulleitung erstellt. Fälschung!</div>`; };
+      if(solved) showRes();
+      mc(el, 5, "Mit welchem Schlüssel prüft ihr die Signaturen?", [
+        ["mit dem öffentlichen Schlüssel der Schulleitung", true, ""],
+        ["mit dem privaten Schlüssel der Schulleitung", false, "Den hat nur die Schulleitung. Mit ihm wird signiert, nicht geprüft."],
+        ["mit dem öffentlichen Schlüssel der Lehrkräfte", false, "Damit verschlüsselt man Nachrichten an die Lehrkräfte. Für die Signatur der Schulleitung hilft er nicht."]], solved, () => { showRes(); ok(); });
+   }},
+   {t:"Die Zertifikate vergleichen", r(el, ok, solved){
+      el.append($(`<p>Der Trick der Täter: Im WLAN SCHULE GAST saßen sie <b>zwischen</b> den Lehrkräften und dem Internet (Man-in-the-Middle). Sie schickten ihren eigenen öffentlichen Schlüssel und taten so, als wären sie das Notenportal. Nur das Zertifikat verrät sie.</p>
+        <div class="grid2">
+         <div class="certbox"><b>Portal A</b> (WLAN der Schule)<table><tr><td>Ausgestellt für</td><td>notenportal.schule-intern.de</td></tr><tr><td>Ausgestellt von</td><td>Zertifizierungsstelle (im Browser hinterlegt)</td></tr><tr><td>Öffentlicher Schlüssel</td><td class="mono">…8F3A 21C7…</td></tr><tr><td>Browser</td><td>🔒 Verbindung ist sicher</td></tr></table></div>
+         <div class="certbox"><b>Portal B</b> (WLAN SCHULE GAST)<table><tr><td>Ausgestellt für</td><td>notenportal-schule-intern.de</td></tr><tr><td>Ausgestellt von</td><td>K. Brandt IT-Service</td></tr><tr><td>Öffentlicher Schlüssel</td><td class="mono">…04BE 9D12…</td></tr><tr><td>Browser</td><td>⚠ Zertifikat nicht vertrauenswürdig (selbst signiert)</td></tr></table></div></div>`));
+      const rest = $(`<div></div>`);
+      mc(el, 5, "Was verrät Portal B?", [
+        ["Der Absender hat sein Zertifikat selbst unterschrieben. Niemand bestätigt, dass der öffentliche Schlüssel zum echten Notenportal gehört.", true, "Ein Zertifikat ist nur vertrauenswürdig, wenn eine Zertifizierungsstelle es unterschreibt, die der Browser kennt."],
+        ["Portal B ist sicher, weil die Verbindung verschlüsselt ist.", false, "Verschlüsselt ja, aber mit dem Schlüssel der Täter. Sie können alles lesen."],
+        ["Portal B ist echt, weil die Adresse fast gleich aussieht.", false, "Schaut genau hin: Bindestrich statt Punkt. Eine andere Adresse."]], solved || S.ui.m5d, () => { S.ui.m5d = true; save(); more(); });
+      el.append(rest);
+      function more(){ ask(rest, 5, "Wer hat das gefälschte Zertifikat ausgestellt? (Feld „Ausgestellt von“)", a => norm(a).includes("BRANDT"), solved, ok, "Name"); }
+      if(solved || S.ui.m5d) more();
+   }}
+  ]},
+ {n:6, name:"Finale: Wer war es?", topic:"Angriff rekonstruieren · Täter · HTTPS · Sicherheitskonzept",
+  story:`Alle Spuren liegen auf dem Tisch. Jetzt rekonstruiert ihr den Angriff, überführt den Täter und entwickelt für die Schulleitung ein Sicherheitskonzept: <b>Wie macht die Schule es künftig besser?</b>`,
+  evidence:`<span class="sys">[Besucherliste Sekretariat] Freitag</span>\n 9:00-12:00  Fortbildung: Referentin Dr. S. Lenz (Lehrerzimmer)\n10:15-11:00  PrintPro, Wartung Kopierer (Raum 104)\n<span class="hot">14:30-15:20  K. Brandt IT-Service, "Abholung Altgeräte" (Lehrerzimmer)</span>\n<span class="sys">Hinweis Schulträger: Vertrag mit K. Brandt IT-Service endete im Juli. Keine Abholung beauftragt.</span>`,
+  heft:"Abgabe: Sicherheitskonzept für die Schulleitung als Plakat oder im Heft. Zu jeder Maßnahme: Welchen Schritt hätte sie verhindert, welches Verfahren steckt dahinter? (AB 6, Aufgaben 1, 2 und 4)",
+  clue:"Täter überführt: K. Brandt IT-Service, der ehemalige externe Dienstleister der Schule.",
+  steps:[
+   {t:"Den Angriff rekonstruieren", r(el, ok, solved){
+      el.append($(`<p>Klickt die Schritte des Angriffs in der richtigen Reihenfolge an.</p>`));
+      let pos = 0; const box = $(`<div></div>`); el.append(box);
+      shuffle(ATTACK.map((s,i)=>[s,i])).forEach(([s,i]) => { const b = $(`<button class="opt"><b class="nr" style="color:var(--petrol);margin-right:8px"></b>${s}</button>`);
+        if(solved){ b.classList.add("good"); b.querySelector(".nr").textContent = (i+1)+"."; b.style.order = i; }
+        b.onclick = () => { if(solved || b.classList.contains("good")) return;
+          if(i===pos){ b.classList.add("good"); b.querySelector(".nr").textContent = (pos+1)+"."; pos++; if(pos===ATTACK.length){ solved = true; ok(); } }
+          else { fail(6); shakeEl(b); } };
+        box.append(b); });
+      if(solved){ box.style.display = "flex"; box.style.flexDirection = "column"; }
+   }},
+   {t:"Wer war es?", r(el, ok, solved){
+      const SUS = [["Dr. S. Lenz, Referentin der Fortbildung","Sie war nur bis 12 Uhr im Lehrerzimmer. Das falsche WLAN und die Mails kamen erst am Nachmittag."],
+                   ["PrintPro, Wartung des Kopierers","Der Techniker war nur in Raum 104, nicht im Lehrerzimmer."],
+                   ["K. Brandt IT-Service, ehemaliger IT-Dienstleister",""],
+                   ["Unbekannter Nachbar mit offenem WLAN","Das WLAN SCHULE GAST stand im Lehrerzimmer, nicht draußen."]];
+      mc(el, 6, "Wer steckt hinter dem Angriff? Nutzt die Besucherliste und eure Ermittlungsnotizen.", SUS.map(([t,w]) => [t, !w, w || "Überführt: Das gefälschte Zertifikat trägt den Namen K. Brandt IT-Service. Laut Besucherliste war die Firma am Freitag von 14:30 bis 15:20 Uhr ohne Auftrag im Lehrerzimmer, genau als SCHULE GAST auftauchte und die Mails kamen."]), solved, ok);
+   }},
+   {t:"Wie macht die Schule es besser?", r(el, ok, solved){
+      el.append($(`<p>Ordnet jedem Schritt des Angriffs die Maßnahme zu, die ihn gestoppt hätte. Zwei Maßnahmen helfen gar nicht.</p>`));
+      const tb = $(`<table class="mt"><tr><th>Schritt des Angriffs</th><th style="width:52%">Maßnahme</th></tr></table>`); el.append(tb);
+      const opts = shuffle(MEASURES.concat(DISTRACT));
+      const sels = ATTACK.map((a,i) => { const tr = $(`<table><tr><td><b>${i+1}.</b> ${a}</td><td><select><option value="">wählen …</option>${opts.map(o=>`<option>${o}</option>`).join("")}</select></td></tr></table>`).querySelector("tr"); tb.querySelector("tbody").append(tr); const s = tr.querySelector("select"); if(solved){ s.value = MEASURES[i]; s.disabled = true; } return s; });
+      const b = $(`<div class="row" style="margin-top:10px"><button class="btn">Prüfen</button><span class="small res"></span></div>`); el.append(b);
+      if(solved){ b.querySelector("button").disabled = true; return; }
+      b.querySelector("button").onclick = () => { let r = 0; sels.forEach((s,i) => { const good = s.value === MEASURES[i]; if(good) r++; s.style.borderColor = good ? "var(--ok)" : "var(--red)"; });
+        b.querySelector(".res").textContent = `${r} von ${ATTACK.length} richtig`;
+        if(r === ATTACK.length){ sels.forEach(s=>s.disabled=true); b.querySelector("button").disabled = true; ok(); } else { fail(6); shakeEl(tb); } };
+      hints(el, 6, "m6s3", ["Die beiden Maßnahmen, die nichts nützen, haben mit Caesar und mit dem Abschalten zu tun.","Signaturen helfen gegen gefälschte Mails, Zertifikate gegen gefälschte Seiten."]);
+   }},
+   {t:"Das Schloss im Browser: hybride Verschlüsselung", r(el, ok, solved){
+      el.append($(`<p>Das echte Notenportal nutzt HTTPS. Dabei arbeiten beide Verfahren zusammen: Mit dem <b>asymmetrischen</b> Verfahren (Zertifikat, öffentlicher Schlüssel) wird sicher ein gemeinsamer <b>Sitzungsschlüssel</b> vereinbart. Damit werden dann alle Daten <b>symmetrisch</b> verschlüsselt.</p>`));
+      const rest = $(`<div></div>`);
+      mc(el, 6, "Warum macht man das so umständlich?", [
+        ["Asymmetrische Verfahren lösen das Schlüsselproblem, sind aber langsam. Symmetrische Verfahren sind schnell. Hybrid verbindet beide Vorteile.", true, ""],
+        ["Weil symmetrische Verfahren unsicher sind.", false, "Moderne symmetrische Verfahren wie AES sind sehr sicher. Ihr Problem ist nur der Schlüsselaustausch."],
+        ["Weil man so kein Zertifikat braucht.", false, "Gerade das Zertifikat schützt vor dem Man-in-the-Middle."]], solved || S.ui.m6d, () => { S.ui.m6d = true; save(); more(); });
+      el.append(rest);
+      function more(){ mc(rest, 6, "Die Schulleitung schreibt im Messenger mit Ende-zu-Ende-Verschlüsselung. Was bedeutet das?", [
+        ["Auch der Server des Messenger-Anbieters kann die Nachrichten nicht lesen, nur Absender und Empfänger.", true, "Bei reiner Transportverschlüsselung (z. B. HTTPS zum Server) könnte der Server mitlesen."],
+        ["Nur der Weg bis zum Server ist verschlüsselt.", false, "Das ist Transportverschlüsselung."],
+        ["Die Nachrichten werden gar nicht gespeichert.", false, "Damit hat Verschlüsselung nichts zu tun."]], solved, ok); }
+      if(solved || S.ui.m6d) more();
+   }}
+  ],
+  after(el){ const q = $(`<div class="step"><div class="shead"><span class="snum">★</span><span class="stitle">Abschlussquiz für die Rangliste</span></div><div class="qz"></div></div>`); el.append(q); QZ = q.querySelector(".qz"); quiz(QZ); }
+ }
+];
+let QZ = null;
+const ATTACK = ["Die Täter lesen das WLAN-Passwort vom Klebezettel im Lehrerzimmer ab.",
+                "Im Lehrerzimmer wird ein eigenes WLAN mit dem Namen SCHULE GAST aufgebaut.",
+                "Eine gefälschte Mail lockt die Lehrkräfte auf ein falsches Notenportal.",
+                "Lehrkräfte klicken die Zertifikatswarnung weg.",
+                "Als Man-in-the-Middle lesen die Täter die eingegebenen Passwörter mit.",
+                "Am Wochenende melden sich die Täter mit den Konten am Notenserver an."];
+const MEASURES = ["Passwörter nie aufschreiben und das WLAN-Passwort regelmäßig ändern",
+                  "Geräte nur mit dem geprüften Schul-WLAN verbinden, fremde Netze melden",
+                  "Mails der Schulleitung immer digital signieren und Signaturen prüfen",
+                  "Bei einer Zertifikatswarnung die Seite sofort verlassen",
+                  "Anmeldung nur über HTTPS mit gültigem Zertifikat einer Zertifizierungsstelle",
+                  "Zwei-Faktor-Anmeldung: Das Passwort allein reicht nicht"];
+const DISTRACT = ["Alle Nachrichten mit Caesar verschlüsseln","Den Notenserver nachts ausschalten"];
+
+/* =====================================================================
+   Abschlussquiz
+   ===================================================================== */
 const Q = [
- ["Wie viele sinnvolle Schlüssel gibt es beim Caesar-Verfahren?", ["25","26","2 hoch 128","unendlich viele"], 0],
- ["Warum funktioniert die Häufigkeitsanalyse bei Caesar?", ["Jeder Buchstabe wird immer durch denselben Buchstaben ersetzt.","Der Schlüssel steht im Geheimtext.","Caesar lässt Vokale unverändert.","Der Geheimtext ist kürzer als der Klartext."], 0],
- ["Was besagt das Prinzip von Kerckhoffs?", ["Die Sicherheit darf nur von der Geheimhaltung des Schlüssels abhängen.","Das Verfahren muss geheim bleiben.","Schlüssel müssen mindestens 8 Zeichen lang sein.","Man soll nie dasselbe Verfahren zweimal nutzen."], 0],
- ["10 Personen wollen paarweise symmetrisch geheim kommunizieren. Wie viele Schlüssel braucht man?", ["45","10","20","100"], 0],
- ["Anna will Ben eine vertrauliche Nachricht schicken. Womit verschlüsselt sie?", ["mit Bens öffentlichem Schlüssel","mit Bens privatem Schlüssel","mit ihrem privaten Schlüssel","mit ihrem öffentlichen Schlüssel"], 0],
- ["Womit erstellt Anna eine digitale Signatur?", ["mit ihrem privaten Schlüssel","mit ihrem öffentlichen Schlüssel","mit Bens öffentlichem Schlüssel","mit einem gemeinsamen Passwort"], 0],
- ["Was bestätigt ein Zertifikat?", ["dass ein öffentlicher Schlüssel zu einem bestimmten Inhaber gehört","dass eine Webseite keine Viren enthält","dass die Verbindung schnell ist","dass der private Schlüssel geheim ist"], 0],
- ["Warum nutzt HTTPS ein hybrides Verfahren?", ["Asymmetrisch wird nur der Sitzungsschlüssel ausgetauscht, die Daten laufen schnell symmetrisch.","Symmetrische Verfahren sind unsicher.","Asymmetrische Verfahren brauchen keinen Schlüssel.","So braucht man kein Zertifikat."], 0],
- ["Was garantiert das Schloss im Browser NICHT?", ["dass der Betreiber der Seite ehrlich ist","dass die Verbindung verschlüsselt ist","dass das Zertifikat zur Adresse passt","dass niemand unterwegs mitlesen kann"], 0],
- ["Was ist bei Ende-zu-Ende-Verschlüsselung anders als bei Transportverschlüsselung?", ["Auch der Server des Anbieters kann die Nachricht nicht lesen.","Die Nachricht wird gar nicht verschlüsselt.","Nur der Weg zum Server ist verschlüsselt.","Man braucht kein Schlüsselpaar."], 0]
+ ["Wie viele sinnvolle Schlüssel gibt es beim Caesar-Verfahren?", ["25","26","2 hoch 128","unendlich viele"]],
+ ["Warum funktioniert die Häufigkeitsanalyse bei Caesar?", ["Jeder Buchstabe wird immer durch denselben Buchstaben ersetzt.","Der Schlüssel steht im Geheimtext.","Caesar lässt Vokale unverändert.","Der Geheimtext ist kürzer als der Klartext."]],
+ ["Was besagt das Prinzip von Kerckhoffs?", ["Die Sicherheit darf nur von der Geheimhaltung des Schlüssels abhängen.","Das Verfahren muss geheim bleiben.","Schlüssel müssen mindestens 8 Zeichen lang sein.","Man soll nie dasselbe Verfahren zweimal nutzen."]],
+ ["10 Personen wollen paarweise symmetrisch geheim kommunizieren. Wie viele Schlüssel braucht man?", ["45","10","20","100"]],
+ ["Anna will Ben eine vertrauliche Nachricht schicken. Womit verschlüsselt sie?", ["mit Bens öffentlichem Schlüssel","mit Bens privatem Schlüssel","mit ihrem privaten Schlüssel","mit ihrem öffentlichen Schlüssel"]],
+ ["Womit erstellt Anna eine digitale Signatur?", ["mit ihrem privaten Schlüssel","mit ihrem öffentlichen Schlüssel","mit Bens öffentlichem Schlüssel","mit einem gemeinsamen Passwort"]],
+ ["Was bestätigt ein Zertifikat?", ["dass ein öffentlicher Schlüssel zu einem bestimmten Inhaber gehört","dass eine Webseite keine Viren enthält","dass die Verbindung schnell ist","dass der private Schlüssel geheim ist"]],
+ ["Warum nutzt HTTPS ein hybrides Verfahren?", ["Asymmetrisch wird nur der Sitzungsschlüssel vereinbart, die Daten laufen schnell symmetrisch.","Symmetrische Verfahren sind unsicher.","Asymmetrische Verfahren brauchen keinen Schlüssel.","So braucht man kein Zertifikat."]],
+ ["Was garantiert das Schloss im Browser NICHT?", ["dass der Betreiber der Seite ehrlich ist","dass die Verbindung verschlüsselt ist","dass das Zertifikat zur Adresse passt","dass unterwegs niemand mitlesen kann"]],
+ ["Was ist bei Ende-zu-Ende-Verschlüsselung anders als bei Transportverschlüsselung?", ["Auch der Server des Anbieters kann die Nachricht nicht lesen.","Die Nachricht wird gar nicht verschlüsselt.","Nur der Weg zum Server ist verschlüsselt.","Man braucht kein Schlüsselpaar."]]
 ];
 function quiz(el){
-  if(!S.solved[6]){ el.innerHTML = `<p class="small">Das Quiz öffnet sich, wenn ihr den Täter überführt habt.</p>`; return; }
-  if(S.quizDone) return certificate(el);
-  if(!S.quiz) { S.quiz = {i:0, pts:0, order: shuffle(Q.map((_,i)=>i)), tries:0}; save(); }
-  const z = S.quiz; if(z.i >= Q.length){ S.quizDone = true; save(); return certificate(el); }
+  if(!missionDone(6)){ el.innerHTML = `<p class="small">Das Quiz öffnet sich, wenn ihr alle Schritte von Mission 6 gelöst habt.</p>`; return; }
+  if(S.quizDone){ el.innerHTML = `<div class="fb ok">Quiz abgeschlossen: <b>${S.quizPts} von 20 Punkten.</b> Sichert jetzt euren Stand und schickt das Foto an eure Lehrkraft.</div><div class="row" style="margin-top:10px"><button class="btn amber">📷 Abschlussbericht anzeigen</button></div>`; el.querySelector("button").onclick = report; return; }
+  if(!S.quiz){ S.quiz = {i:0, pts:0, order: shuffle(Q.map((_,i)=>i)), tries:0}; save(); }
+  const z = S.quiz; if(z.i >= Q.length){ S.quizDone = true; S.quizPts = z.pts; save(); pips(); return quiz(el); }
   const [q, opts] = Q[z.order[z.i]];
-  el.innerHTML = `<p class="small">Frage ${z.i+1} von ${Q.length} · bisher ${z.pts} Punkte · richtig im ersten Versuch: 2 Punkte, im zweiten: 1 Punkt</p><p><b>${q}</b></p><div class="o"></div>`;
+  el.innerHTML = `<p class="small">Frage ${z.i+1} von ${Q.length} · bisher ${z.pts} Punkte · im ersten Versuch 2 Punkte, im zweiten 1 Punkt</p><p><b>${q}</b></p><div class="o"></div>`;
   const od = el.querySelector(".o");
   shuffle(opts.map((t,i)=>[t,i])).forEach(([t,i]) => { const b = $(`<button class="opt">${t}</button>`); b.onclick = () => {
-    if(b.classList.contains("bad")) return;
+    if(b.classList.contains("bad") || b.classList.contains("good")) return;
     if(i===0){ z.pts += z.tries===0 ? 2 : z.tries===1 ? 1 : 0; z.tries = 0; z.i++; b.classList.add("good"); save(); setTimeout(()=>quiz(el), 600); }
     else { z.tries++; b.classList.add("bad"); save(); }
   }; od.append(b); });
 }
-function certificate(el){
-  const p = S.quiz ? S.quiz.pts : 0;
-  el.innerHTML = `<div class="cert card"><span class="tag">Fall abgeschlossen</span><h2>Team ${S.team || "(ohne Namen)"}</h2><div class="big">${p} / 20</div><p>Quizpunkte für die Rangliste</p><p>Prüfcode: <b class="mono">${code(S.team, p)}</b></p><p class="small">Zeigt diese Seite eurer Lehrkraft. Gebt danach euer Sicherheitskonzept ab.</p></div>`;
+
+/* =====================================================================
+   Seiten
+   ===================================================================== */
+function home(){
+  pips(); app.innerHTML = ""; window.scrollTo(0,0);
+  const hero = $(`<div class="dark hero"><span class="stamp">VERTRAULICH</span><span class="tag">Fallakte Nr. 2711 · nur für das Forensik-Team</span>
+    <h1>Tatort Schulnetz</h1>
+    <p>Jemand hat sich Zugang zum Notenserver der Schule verschafft. Ihr seid das Forensik-Team. In sechs Missionen entschlüsselt ihr abgefangene Nachrichten, lernt die Werkzeuge der Kryptografie kennen und überführt den Täter. Am Ende schreibt ihr ein Sicherheitskonzept für die Schulleitung.</p>
+    <div class="row" style="margin-top:14px"><input type="text" class="grow tn" placeholder="Name eures Teams" maxlength="30" value="${esc(S.team)}" style="max-width:340px"><button class="btn amber sv">Team speichern</button></div>
+    <details style="margin-top:12px"><summary style="cursor:pointer;color:var(--cyan)">Weitermachen mit Stand-Code (z. B. nach gelöschtem Verlauf oder an einem anderen Rechner)</summary>
+      <div class="row" style="margin-top:8px"><input type="text" class="rt" placeholder="Teamname" style="max-width:200px"><input type="text" class="rc mono" placeholder="XXXXX-XXXXX-XXXXX" style="max-width:240px"><button class="btn ghost small rb">Laden</button></div><div class="rr"></div></details>
+  </div>`);
+  app.append(hero);
+  hero.querySelector(".sv").onclick = () => { S.team = hero.querySelector(".tn").value.trim(); save(); pips(); shakeEl(hero.querySelector(".sv")); };
+  hero.querySelector(".rb").onclick = () => {
+    const st = readCode(hero.querySelector(".rt").value, hero.querySelector(".rc").value);
+    if(!st){ hero.querySelector(".rr").innerHTML = `<div class="fb err">Code und Teamname passen nicht zusammen. Achtet auf die genaue Schreibweise des Teamnamens.</div>`; return; }
+    S = st; save(); home();
+  };
+  const grid = $(`<div class="missions"></div>`);
+  for(const m of M){
+    const done = missionDone(m.n), open = unlocked(m.n), k = (S.steps[m.n]||[]).filter(Boolean).length;
+    const b = $(`<button class="mcard ${done?"done":""} ${open?"":"locked"}" data-tab="MISSION 0${m.n}">${done?`<span class="stamp ok" style="font-size:12px;top:auto;bottom:12px;right:12px">GELÖST</span>`:!open?`<span class="stamp" style="font-size:12px;top:auto;bottom:12px;right:12px">GESPERRT</span>`:""}
+      <div class="t">${m.name}</div><div class="small">${m.topic}</div><div class="st">${done?"✓ gelöst · "+missionPts(m.n)+" Punkte":open?`${k} von ${NSTEPS[m.n-1]} Schritten`:"erst Mission "+(m.n-1)+" lösen"}</div></button>`);
+    if(open) b.onclick = () => mission(m.n);
+    grid.append(b);
+  }
+  app.append(grid);
+  const notes = M.filter(m => missionDone(m.n)).map(m => `<li>${m.clue}</li>`);
+  if(S.extra) notes.splice(2,0,`<li>Expertenspur: Die Täter verlassen sich darauf, dass Lehrkräfte Zertifikatswarnungen wegklicken.</li>`);
+  app.append($(`<div class="file" data-tab="Ermittlungsnotizen"><h3>Was wir bisher wissen</h3>${notes.length?`<ul class="notes">${notes.join("")}</ul>`:`<p class="small">Noch keine Spuren. Startet mit Mission 1.</p>`}</div>`));
+  if(TEACHER) teacherPanel();
 }
 
-/* ================= Start ================= */
+function mission(n){
+  const m = M[n-1]; pips(); app.innerHTML = ""; window.scrollTo(0,0);
+  app.append($(`<div class="file story" data-tab="Mission 0${n} · ${m.topic}">${missionDone(n)?`<span class="stamp ok">GELÖST</span>`:""}<h2>${m.name}</h2><p>${m.story}</p>${m.evidence?`<div class="evidence">${m.evidence}</div>`:""}</div>`));
+  if(m.intro) app.append($(m.intro));
+  const steps = $(`<div></div>`); app.append(steps);
+  const cards = [];
+  m.steps.forEach((st,i) => { const c = $(`<div></div>`); steps.append(c); cards.push(c); });
+  const finish = $(`<div></div>`); app.append(finish);
+  function renderStep(i){
+    const c = cards[i]; c.innerHTML = ""; const st = m.steps[i]; const done = stepDone(n,i), open = TEACHER || i===0 || stepDone(n,i-1);
+    const card = $(`<div class="step ${done?"solved":""} ${open?"":"locked"}"><div class="shead"><span class="snum">${done?"✓":i+1}</span><span class="stitle">${st.t}</span><span class="small">Schritt ${i+1} von ${m.steps.length}</span></div><div class="sb"></div></div>`);
+    c.append(card);
+    if(!open){ card.querySelector(".sb").innerHTML = `<p class="small" style="margin:0">🔒 Öffnet sich, wenn Schritt ${i} gelöst ist.</p>`; return; }
+    st.r(card.querySelector(".sb"), () => { const was = missionDone(n); markStep(n,i); card.classList.add("solved"); card.querySelector(".snum").textContent = "✓"; card.querySelector(".sb").append($(`<div class="fb ok pop">✓ Schritt gelöst.</div>`)); if(i+1 < m.steps.length) renderStep(i+1); if(!was && missionDone(n)){ renderFinish(true); if(n===6 && QZ) quiz(QZ); } }, done);
+  }
+  function renderFinish(fresh){
+    finish.innerHTML = "";
+    if(!missionDone(n)) return;
+    finish.append($(`<div class="file ${fresh?"pop":""}" data-tab="Neue Spur"><span class="stamp ok">GELÖST</span><h3>Mission ${n} gelöst · ${missionPts(n)} Punkte</h3><p style="font-size:18px">🔎 ${m.clue}</p><p class="small">${m.heft}</p>
+      <div class="row">${n<6?`<button class="btn nx">Weiter zu Mission ${n+1} ▶</button>`:""}<button class="btn amber ph">📷 Stand sichern</button><button class="btn ghost bk">Zur Fallakte</button></div></div>`));
+    const nx = finish.querySelector(".nx"); if(nx) nx.onclick = () => mission(n+1);
+    finish.querySelector(".ph").onclick = report; finish.querySelector(".bk").onclick = home;
+  }
+  m.steps.forEach((_,i) => renderStep(i));
+  if(m.after) m.after(app);
+  renderFinish(false);
+  if(!missionDone(n)) app.append($(`<div class="dark"><span class="tag">Für euer Heft</span><p style="margin:6px 0 0">${m.heft}</p></div>`));
+  const nav = $(`<div class="row" style="margin-top:16px"><button class="btn ghost">◀ Zur Fallakte</button><button class="btn amber">📷 Stand sichern</button></div>`);
+  nav.children[0].onclick = home; nav.children[1].onclick = report; app.append(nav);
+}
+
+/* ---------- Bericht zum Abfotografieren ---------- */
+function report(){
+  pips(); app.innerHTML = ""; window.scrollTo(0,0);
+  if(!S.team){
+    const c = $(`<div class="dark"><h2>Stand sichern</h2><p>Gebt zuerst euren Teamnamen ein. Er gehört zum Code dazu.</p><div class="row"><input type="text" class="grow" placeholder="Name eures Teams" maxlength="30" style="max-width:340px"><button class="btn amber">Weiter</button></div></div>`);
+    app.append(c); c.querySelector("button").onclick = () => { const v = c.querySelector("input").value.trim(); if(v){ S.team = v; save(); report(); } }; return;
+  }
+  const now = new Date(), d = now.toLocaleDateString("de-DE") + ", " + now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+  const rows = M.map(m => { const k = (S.steps[m.n]||[]).filter(Boolean).length; return `<tr><td>${m.n}. ${m.name}</td><td>${missionDone(m.n)?"✓ gelöst":k?k+" / "+NSTEPS[m.n-1]+" Schritte":"–"}</td><td>${S.fails[m.n]||0}</td><td>${S.hints[m.n]||0}</td><td><b>${missionPts(m.n)}</b></td></tr>`; }).join("");
+  const r = $(`<div class="report"><span class="stamp">STANDBERICHT</span><span class="tag">SpionCamp · Tatort Schulnetz</span><h2 style="margin-top:6px">Team ${esc(S.team)}</h2><p class="small">${d}</p>
+    <table><tr><th>Mission</th><th>Stand</th><th>Fehlversuche</th><th>Hilfen</th><th>Punkte</th></tr>${rows}
+    <tr><td>Java Expertenlabor</td><td>${S.java.e?"✓":"–"}</td><td></td><td></td><td><b>${S.java.e?4:0}</b></td></tr>
+    <tr><td>Expertenspur</td><td>${S.extra?"✓":"–"}</td><td></td><td></td><td><b>${S.extra?2:0}</b></td></tr>
+    <tr><td>Abschlussquiz</td><td>${S.quizDone?"✓":"–"}</td><td></td><td></td><td><b>${S.quizDone?S.quizPts:0}</b></td></tr>
+    <tr><td colspan="4"><b>Gesamt</b></td><td><b style="font-size:20px">${totalPts()} / ${MAXPTS}</b></td></tr></table>
+    <p style="margin-bottom:2px"><b>Stand-Code</b></p><div class="bigcode">${makeCode(S)}</div>
+    <p class="small">📷 Fotografiert diese Seite und schickt das Foto eurer Lehrkraft. Mit Teamname und Code könnt ihr beim nächsten Mal genau hier weitermachen, auch an einem anderen Rechner: Startseite → „Weitermachen mit Stand-Code“.</p>
+    <div class="row"><button class="btn ghost">◀ Zurück zur Fallakte</button></div></div>`);
+  r.querySelector("button").onclick = home; app.append(r);
+}
+
+/* ---------- Lehrkraft ---------- */
+const TKEY = KEY + "-klasse";
+function tload(){ try{ return JSON.parse(localStorage.getItem(TKEY)||"[]"); }catch(e){ return []; } }
+function tsave(a){ try{ localStorage.setItem(TKEY, JSON.stringify(a)); }catch(e){} }
+function teacherPanel(){
+  const p = $(`<div class="dark"><span class="tag">Lehrkraft</span><h2>Klassenübersicht</h2>
+    <p class="small" style="color:#cfdcda">Im Lehrermodus sind alle Missionen und Schritte offen. Tragt hier Teamname und Stand-Code von den Fotos ein. Ein falscher Code wird abgelehnt, also lässt sich kein Stand fälschen. Die Liste bleibt in diesem Browser gespeichert. Ein neuerer Code desselben Teams ersetzt den alten.</p>
+    <div class="row"><input type="text" class="tn" placeholder="Teamname" style="max-width:200px"><input type="text" class="tc" placeholder="XXXXX-XXXXX-XXXXX" style="max-width:240px"><button class="btn amber small ta">Hinzufügen</button><span class="msg small"></span></div>
+    <div class="tt" style="margin-top:14px"></div>
+    <div class="row" style="margin-top:12px"><button class="btn ghost small csv">Als CSV herunterladen</button><button class="btn ghost small clr">Liste leeren</button></div></div>`);
+  app.append(p);
+  const draw = () => {
+    const L = tload();
+    if(!L.length){ p.querySelector(".tt").innerHTML = `<p class="small" style="color:#7f9a97">Noch keine Teams eingetragen.</p>`; return; }
+    const head = `<tr><th>Team</th>${M.map(m=>`<th title="${m.name}">M${m.n}</th>`).join("")}<th>Java E</th><th>Quiz</th><th>Gesamt</th><th>Stand vom</th><th></th></tr>`;
+    const body = L.map((e,ix) => { const st = readCode(e.team, e.code); if(!st) return ""; const old = S; S = st;
+      const cells = M.map(m => { const k = (st.steps[m.n]||[]).filter(Boolean).length; const done = missionDone(m.n);
+        return `<td title="${st.fails[m.n]} Fehlversuche, ${st.hints[m.n]} Hilfen">${done?`<b style="color:#8fe3a8">${missionPts(m.n)}</b>`:k?`<span style="color:var(--amber)">${k}/${NSTEPS[m.n-1]}</span>`:"–"}<br><span style="font-size:11px;color:#7f9a97">F${st.fails[m.n]} H${st.hints[m.n]}</span></td>`; }).join("");
+      const row = `<tr><td>${esc(e.team)}</td>${cells}<td>${st.java.e?"✓":"–"}</td><td>${st.quizDone?st.quizPts:"–"}</td><td><b>${totalPts()}</b></td><td style="font-size:12px">${e.t}</td><td><button class="btn ghost small del" data-i="${ix}">✕</button></td></tr>`;
+      S = old; return row; }).join("");
+    p.querySelector(".tt").innerHTML = `<table>${head}${body}</table><p class="small" style="color:#7f9a97">M1 bis M6: Punkte der gelösten Mission (grün) oder gelöste Schritte (gelb). F = Fehlversuche, H = genutzte Hilfen.</p>`;
+    p.querySelectorAll(".del").forEach(b => b.onclick = () => { const L = tload(); L.splice(+b.dataset.i,1); tsave(L); draw(); });
+  };
+  p.querySelector(".ta").onclick = () => {
+    const team = p.querySelector(".tn").value.trim(), code = p.querySelector(".tc").value.trim(), msg = p.querySelector(".msg");
+    if(!readCode(team, code)){ msg.textContent = "Code passt nicht zum Teamnamen."; msg.style.color = "#ff9d8a"; return; }
+    const L = tload().filter(e => teamKey(e.team) !== teamKey(team)); L.push({team, code, t: new Date().toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})});
+    L.sort((a,b) => a.team.localeCompare(b.team)); tsave(L); msg.textContent = "✓ eingetragen"; msg.style.color = "#8fe3a8"; p.querySelector(".tn").value = ""; p.querySelector(".tc").value = ""; draw();
+  };
+  p.querySelector(".csv").onclick = () => {
+    const L = tload(); let csv = "Team;" + M.map(m=>`M${m.n} Punkte;M${m.n} Schritte;M${m.n} Fehlversuche;M${m.n} Hilfen`).join(";") + ";Java Experte;Expertenspur;Quiz;Gesamt;Code;Stand vom\n";
+    const old = S;
+    L.forEach(e => { const st = readCode(e.team, e.code); if(!st) return; S = st;
+      csv += `${e.team};` + M.map(m => `${missionPts(m.n)};${(st.steps[m.n]||[]).filter(Boolean).length};${st.fails[m.n]};${st.hints[m.n]}`).join(";") + `;${st.java.e?1:0};${st.extra?1:0};${st.quizDone?st.quizPts:""};${totalPts()};${e.code};${e.t}\n`; });
+    S = old;
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"})); a.download = "spioncamp_klassenuebersicht.csv"; a.click();
+  };
+  p.querySelector(".clr").onclick = () => { if(p.querySelector(".clr").dataset.c){ tsave([]); draw(); p.querySelector(".clr").textContent = "Liste leeren"; delete p.querySelector(".clr").dataset.c; } else { p.querySelector(".clr").dataset.c = 1; p.querySelector(".clr").textContent = "Wirklich leeren? Nochmal klicken"; } };
+  draw();
+}
+
+/* =====================================================================
+   Start
+   ===================================================================== */
 home();
 </script>
 </body>

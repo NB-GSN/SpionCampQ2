@@ -11,11 +11,13 @@ Fortsetzung des Lernspiels „Störfall im Schulnetz“ (https://nb-gsn.github.i
 5. Echt oder gefälscht? Schlüsselpaar, Signatur, Man-in-the-Middle, Zertifikate
 6. Finale: Angriff rekonstruieren, Täter überführen, Sicherheitskonzept, Abschlussquiz
 
-**BlueJ-Projekt:** `SpionCamp_Caesar.zip` (in BlueJ über Projekt → ZIP/JAR öffnen). Klassen: `Caesar` (Lückencode), `Beweismittel` (abgefangene Nachrichten), `Pruefstand` (Selbsttest je Stufe).
+**BlueJ-Projekt:** `SpionCamp_Caesar.zip` (in BlueJ über Projekt → ZIP/JAR öffnen). Klassen: `Caesar` (Lückentext L1–L12), `Beweismittel` (abgefangene Nachrichten), `Pruefstand` (Selbsttest je Stufe).
 
 ## Für die Lehrkraft
 
-- Alle Missionen offen: https://nb-gsn.github.io/SpionCampQ2/#lehrkraft (dort auch Prüfcodes kontrollieren)
-- Missionen öffnen sich nacheinander, sobald das Ermittlungsergebnis der vorherigen stimmt. Fortschritt bleibt im Browser des Teams.
-- Quiz: 10 Fragen, bis zu 20 Punkte, Prüfcode für die Rangliste.
+- Lehrermodus: https://nb-gsn.github.io/SpionCampQ2/#lehrkraft (alle Missionen offen, Klassenübersicht aus Stand-Codes, CSV-Export)
+- Jede Mission besteht aus 3 bis 4 Schritten, die sich nacheinander öffnen. Fortschritt bleibt im Browser des Teams.
+- „Stand sichern“ zeigt einen Standbericht mit Punkten, Fehlversuchen, genutzten Hilfen und einem Stand-Code. Die Teams fotografieren ihn am Stundenende. Mit Teamname und Code geht es beim nächsten Mal weiter (auch auf einem anderen Rechner).
+- Java-Labor als Lückentext (L1 bis L12) mit gestuften Hilfen auf der Seite. Im BlueJ-Projekt stehen an denselben Stellen kompilierbare Platzhalter.
+- Quiz: 10 Fragen, bis zu 20 Punkte.
 - QR-Code: `qr-plakat.png` (Beamer/Aushang, mit Geheimbotschaft in Caesar k = 3) und `qr-code.png`.
