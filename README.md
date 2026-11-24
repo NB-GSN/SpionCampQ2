@@ -18,3 +18,4 @@ Fortsetzung des Lernspiels „Störfall im Schulnetz“ (https://nb-gsn.github.i
 - Alle Missionen offen: https://nb-gsn.github.io/SpionCampQ2/#lehrkraft (dort auch Prüfcodes kontrollieren)
 - Missionen öffnen sich nacheinander, sobald das Ermittlungsergebnis der vorherigen stimmt. Fortschritt bleibt im Browser des Teams.
 - Quiz: 10 Fragen, bis zu 20 Punkte, Prüfcode für die Rangliste.
+- QR-Code: `qr-plakat.png` (Beamer/Aushang, mit Geheimbotschaft in Caesar k = 3) und `qr-code.png`.
