@@ -19,5 +19,7 @@ Fortsetzung des Lernspiels „Störfall im Schulnetz“ (https://nb-gsn.github.i
 - Jede Mission besteht aus 3 bis 4 Schritten, die sich nacheinander öffnen. Fortschritt bleibt im Browser des Teams.
 - „Stand sichern“ zeigt einen Standbericht mit Punkten, Fehlversuchen, genutzten Hilfen und einem Stand-Code. Die Teams fotografieren ihn am Stundenende. Mit Teamname und Code geht es beim nächsten Mal weiter (auch auf einem anderen Rechner).
 - Java-Labor als Lückentext (L1 bis L12) mit gestuften Hilfen auf der Seite. Im BlueJ-Projekt stehen an denselben Stellen kompilierbare Platzhalter.
-- Quiz: 10 Fragen, bis zu 20 Punkte.
+- Transferaufgabe nach Mission 4: Klasse `Vigenere` ohne Lücken selbst schreiben (5 gestufte Hilfen auf der Seite, Test `pruefeVigenere()`), +6 Punkte.
+- Mission 6: Abschlussbericht an die Schulleitung als Klausurtraining auf Papier (30 min, 20 Punkte, Operatoren wie im Abitur).
+- Quiz: 10 Fragen, bis zu 20 Punkte. Camp gesamt: 92 Punkte.
 - QR-Code: `qr-plakat.png` (Beamer/Aushang, mit Geheimbotschaft in Caesar k = 3) und `qr-code.png`.

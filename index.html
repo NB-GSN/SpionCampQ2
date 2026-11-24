@@ -200,7 +200,7 @@ const KEY = "spioncamp-tatort-schulnetz-v2";
 const NSTEPS = [3,4,4,3,4,4];        // Schritte pro Mission
 const TEACHER = location.hash === "#lehrkraft";
 let S = load() || fresh();
-function fresh(){ return {team:"", steps:{}, fails:{}, hints:{}, seen:{}, java:{e:false}, extra:false, quiz:null, quizDone:false, quizPts:0, ui:{}}; }
+function fresh(){ return {team:"", steps:{}, fails:{}, hints:{}, seen:{}, java:{e:false}, extra:false, transfer:false, quiz:null, quizDone:false, quizPts:0, ui:{}}; }
 function load(){ try{ const t = localStorage.getItem(KEY); return t ? Object.assign(fresh(), JSON.parse(t)) : null; }catch(e){ return null; } }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 const stepDone = (n,i) => !!(S.steps[n] && S.steps[n][i]);
@@ -211,8 +211,8 @@ function markStep(n,i){ (S.steps[n] = S.steps[n] || [])[i] = true; save(); pips(
 function fail(n){ S.fails[n] = (S.fails[n]||0)+1; save(); }
 function hintUsed(n,id){ if(S.seen[id]) return; S.seen[id] = true; S.hints[n] = (S.hints[n]||0)+1; save(); }
 function missionPts(n){ return missionDone(n) ? Math.max(6, 10 - Math.min(4, S.fails[n]||0)) : 0; }
-function totalPts(){ let p = 0; for(let n=1;n<=6;n++) p += missionPts(n); if(S.java.e) p += 4; if(S.extra) p += 2; return p + (S.quizDone ? S.quizPts : 0); }
-const MAXPTS = 6*10 + 4 + 2 + 20;
+function totalPts(){ let p = 0; for(let n=1;n<=6;n++) p += missionPts(n); if(S.java.e) p += 4; if(S.extra) p += 2; if(S.transfer) p += 6; return p + (S.quizDone ? S.quizPts : 0); }
+const MAXPTS = 6*10 + 4 + 2 + 6 + 20;
 
 /* =====================================================================
    Stand-Code (Teamname + Fortschritt, mit Prüfsumme)
@@ -224,13 +224,13 @@ function packState(st){
   let v = 0n, bits = 0;
   const put = (x,b) => { v = (v<<BigInt(b)) | BigInt(Math.max(0,Math.min((1<<b)-1, x|0))); bits += b; };
   for(let n=1;n<=6;n++){ let m=0; for(let i=0;i<4;i++) if(st.steps[n] && st.steps[n][i]) m |= (1<<i); put(m,4); put(st.fails[n]||0,3); put(st.hints[n]||0,2); }
-  put(st.java.e?1:0,1); put(st.extra?1:0,1); put(st.quizDone?1:0,1); put(st.quizPts||0,5);
+  put(st.java.e?1:0,1); put(st.extra?1:0,1); put(st.transfer?1:0,1); put(st.quizDone?1:0,1); put(st.quizPts||0,5);
   return [v,bits];
 }
 function makeCode(st){
-  const [v,bits] = packState(st);              // 62 Bit
-  const chk = BigInt(hash(teamKey(st.team)+"|"+v.toString(36)+"|NB-spion") & 0x1FFF); // 13 Bit
-  let all = (v<<13n) | chk, s = "";
+  const [v,bits] = packState(st);              // 63 Bit
+  const chk = BigInt(hash(teamKey(st.team)+"|"+v.toString(36)+"|NB-spion") & 0xFFF); // 12 Bit
+  let all = (v<<12n) | chk, s = "";
   for(let i=0;i<15;i++){ s = A32[Number(all & 31n)] + s; all >>= 5n; }
   return s.slice(0,5)+"-"+s.slice(5,10)+"-"+s.slice(10);
 }
@@ -238,11 +238,11 @@ function readCode(team, code){
   const c = String(code).toUpperCase().replace(/[^A-Z0-9]/g,"");
   if(c.length !== 15) return null;
   let all = 0n; for(const ch of c){ const i = A32.indexOf(ch); if(i<0) return null; all = (all<<5n) | BigInt(i); }
-  const chk = all & 0x1FFFn, v = all >> 13n;
-  if(BigInt(hash(teamKey(team)+"|"+v.toString(36)+"|NB-spion") & 0x1FFF) !== chk) return null;
+  const chk = all & 0xFFFn, v = all >> 12n;
+  if(BigInt(hash(teamKey(team)+"|"+v.toString(36)+"|NB-spion") & 0xFFF) !== chk) return null;
   let x = v; const take = (b) => { const r = Number(x & ((1n<<BigInt(b))-1n)); x >>= BigInt(b); return r; };
   const st = fresh(); st.team = String(team).trim();
-  st.quizPts = take(5); st.quizDone = !!take(1); st.extra = !!take(1); st.java.e = !!take(1);
+  st.quizPts = take(5); st.quizDone = !!take(1); st.transfer = !!take(1); st.extra = !!take(1); st.java.e = !!take(1);
   for(let n=6;n>=1;n--){ st.hints[n] = take(2); st.fails[n] = take(3); const m = take(4); st.steps[n] = [0,1,2,3].map(i => !!(m & (1<<i))); }
   return st;
 }
@@ -628,7 +628,8 @@ const M = [
       }
       draw(); if(phase>=4) quiz();
    }}
-  ]},
+  ],
+  after(el){ transferCard(el); }},
  {n:5, name:"Echt oder gefälscht?", topic:"Schlüsselpaar · Signatur · Man-in-the-Middle · Zertifikate",
   story:`Freitag, 15:10 Uhr: Alle Lehrkräfte bekommen zwei Mails, beide angeblich von der Schulleitung. Eine davon führt zum gefälschten Portal. Wer im WLAN SCHULE GAST war, bekam beim Öffnen außerdem eine Zertifikatswarnung, und viele haben sie weggeklickt.<br><br>Prüft Mails und Zertifikate so, wie es ein Computer tut. Dafür braucht ihr ein neues Werkzeug: Schlüsselpaare.`,
   evidence:null,
@@ -733,10 +734,42 @@ const M = [
       if(solved || S.ui.m6d) more();
    }}
   ],
-  after(el){ const q = $(`<div class="step"><div class="shead"><span class="snum">★</span><span class="stitle">Abschlussquiz für die Rangliste</span></div><div class="qz"></div></div>`); el.append(q); QZ = q.querySelector(".qz"); quiz(QZ); }
+  after(el){ examCard(el); const q = $(`<div class="step"><div class="shead"><span class="snum">★</span><span class="stitle">Abschlussquiz für die Rangliste</span></div><div class="qz"></div></div>`); el.append(q); QZ = q.querySelector(".qz"); quiz(QZ); }
  }
 ];
 let QZ = null;
+const N5 = "GZUG F WRZFL HRJ TUEWTYS QEEE RIZYPZVUN PMI CCYLGYVB UF QFEHUZ ECCS MIYIVB UNJ UVA HHXVEGYKZVI";
+function transferCard(el){
+  const box = $(`<div class="step"><div class="shead"><span class="snum">⚙</span><span class="stitle">Transferaufgabe für alle: Vigenère selbst programmieren</span><span class="small">Unterricht oder Hausaufgabe</span></div></div>`); el.append(box);
+  box.append($(`<div><p>Am Sonntag haben die Täter noch eine lange Nachricht geschickt, wieder mit dem Schlüssel ROUTER. Von Hand dauert das ewig. Diesmal schreibt ihr das Werkzeug <b>ohne Lücken</b> selbst, so wie im Abitur.</p>
+    <ol style="padding-left:22px"><li>Ladet das BlueJ-Projekt neu herunter. Es enthält jetzt die Klasse <code>Vigenere</code> mit zwei leeren Methoden <code>verschluesseln(String text, String schluessel)</code> und <code>entschluesseln(String geheimtext, String schluessel)</code>.</li>
+    <li>Schreibt die beiden Methoden. Eure Klasse <code>Caesar</code> dürft ihr mitbenutzen.</li>
+    <li>Testet mit Rechtsklick auf <code>Pruefstand</code> → <code>pruefeVigenere()</code>.</li>
+    <li>Entschlüsselt dann <code>Beweismittel.NACHRICHT_5</code> mit dem Schlüssel <code>"ROUTER"</code>.</li></ol>
+    <p class="row"><a class="btn amber small" href="SpionCamp_Caesar.zip" download>⬇ BlueJ-Projekt herunterladen</a><span class="small">Wer schon in BlueJ arbeitet: Die Lücken L1 bis L8 müssen gefüllt sein, sonst rechnet Caesar falsch.</span></p></div>`));
+  box.append($(`<div class="evidence"><span class="sys">[Chatprotokoll] So 18:47  Vigenère, Schlüssel ROUTER:</span>\n<span class="hot">${N5}</span></div>`));
+  box.append($(`<p class="small">Nehmt die Hilfen der Reihe nach und nur so viele wie nötig.</p>`));
+  hints(box, 0, "tr", [
+    "<b>Die Idee:</b> Vigenère ist Caesar mit wechselndem k. Für jeden Buchstaben des Textes holt ihr den passenden Buchstaben des Schlüsselworts und macht daraus eine Zahl, genau wie in L1: <code>schluessel.charAt(...) - 'A'</code>. Mit dieser Zahl ruft ihr <code>caesar.verschluesseln(zeichen, k)</code> auf.",
+    "<b>Zwei Zähler:</b> <code>i</code> läuft über den Text. Ein zweiter Zähler <code>j</code> zählt nur die Buchstaben, denn Leerzeichen verbrauchen keinen Schlüsselbuchstaben. Damit das Schlüsselwort von vorne beginnt, nehmt ihr <code>j % schluessel.length()</code>.",
+    "<b>Ablauf in Worten:</b><pre>ergebnis = leer, j = 0\nfür jedes Zeichen im Text:\n    wenn Großbuchstabe:\n        k = Schlüsselbuchstabe an Stelle j % Länge, als Zahl\n        hänge verschobenes Zeichen an ergebnis\n        j um 1 erhöhen\n    sonst:\n        hänge Zeichen unverändert an\ngib ergebnis zurück</pre>",
+    "<b>Gerüst</b> (nur, wenn es gar nicht geht):<pre>String ergebnis = \"\";\nint j = 0;\nfor (int i = 0; i &lt; text.length(); i++) {\n    char zeichen = text.charAt(i);\n    if (zeichen &gt;= 'A' &amp;&amp; zeichen &lt;= 'Z') {\n        int k = schluessel.charAt(______) - 'A';\n        ergebnis = ergebnis + caesar.verschluesseln(______, ______);\n        j++;\n    } else {\n        ergebnis = ergebnis + zeichen;\n    }\n}\nreturn ergebnis;</pre>",
+    "<b>Entschlüsseln:</b> fast dieselbe Methode. Nur die Verschiebung ist anders: Zurück um k ist dasselbe wie vorwärts um <code>(26 - k) % 26</code>."]);
+  ask(box, 0, "Was planen die Täter laut der Nachricht vom Sonntag? (ganzer Klartext)", a => norm(a)==="PLANBFALLSDASFALSCHEWLANAUFFLIEGTWIRLOESCHENAMMONTAGALLESPURENAUFDEMNOTENSERVER", S.transfer, () => { S.transfer = true; save(); box.append($(`<div class="fb ok pop"><b>Transfer geschafft (+6 Punkte).</b> Neue Spur: Die Täter wollten am Montag alle Spuren auf dem Notenserver löschen. Gut, dass die Protokolle schon gesichert sind.</div>`)); }, "Klartext");
+}
+function examCard(el){
+  const box = $(`<div class="file" data-tab="Klausurtraining"><span class="stamp">ABITURNAH</span><h3>Abschlussbericht an die Schulleitung</h3>
+    <p class="small">Bearbeitungszeit 30 Minuten · auf Papier · ohne Camp-Seite · 20 Punkte · Abgabe bei der Lehrkraft</p>
+    <p>Am Wochenende hat sich jemand mit den Konten von drei Lehrkräften am Notenserver angemeldet. Die Täter tauschten Nachrichten zunächst mit Caesar, später mit Vigenère aus und schickten den Vigenère-Schlüssel unverschlüsselt per Mail. Im Lehrerzimmer betrieben sie das WLAN „SCHULE GAST“ und verschickten eine gefälschte Mail der Schulleitung, die auf ein falsches Notenportal mit selbst signiertem Zertifikat führte. Viele Lehrkräfte klickten die Zertifikatswarnung weg und gaben ihr Passwort ein.</p>
+    <ol type="a" style="padding-left:24px">
+     <li><i>Erläutern</i> Sie, warum das Forensik-Team die Vigenère-Nachrichten lesen konnte, obwohl das Verfahren deutlich sicherer ist als Caesar. Gehen Sie dabei auf das Schlüsselaustauschproblem symmetrischer Verfahren ein. <b>(4 P.)</b></li>
+     <li><i>Beschreiben</i> Sie, wie eine Lehrkraft mithilfe einer digitalen Signatur prüfen kann, ob eine Mail tatsächlich von der Schulleitung stammt. <i>Geben</i> Sie dabei <i>an</i>, welcher Schlüssel beim Signieren und welcher beim Prüfen verwendet wird. <b>(4 P.)</b></li>
+     <li><i>Erklären</i> Sie, wie die Täter im WLAN „SCHULE GAST“ als Man-in-the-Middle an die Passwörter gelangt sind. <i>Erläutern</i> Sie, wie ein Zertifikat einer anerkannten Zertifizierungsstelle diesen Angriff verhindert hätte. <b>(5 P.)</b></li>
+     <li>Der Schulträger schlägt vor: „Künftig übertragen wir alle Daten zum Notenserver nur noch asymmetrisch verschlüsselt. Das ist am sichersten.“ <i>Beurteilen</i> Sie diesen Vorschlag. <b>(4 P.)</b></li>
+     <li><i>Beurteilen</i> Sie, ob die Einführung einer Zwei-Faktor-Anmeldung allein ausgereicht hätte, um den Angriff zu verhindern. <b>(3 P.)</b></li></ol>
+    <p class="small">Tipp: Die Operatoren sind dieselben wie im Abitur. „Beurteilen“ heißt: Argumente für und gegen abwägen und zu einem begründeten Urteil kommen.</p></div>`);
+  el.append(box);
+}
 const ATTACK = ["Die Täter lesen das WLAN-Passwort vom Klebezettel im Lehrerzimmer ab.",
                 "Im Lehrerzimmer wird ein eigenes WLAN mit dem Namen SCHULE GAST aufgebaut.",
                 "Eine gefälschte Mail lockt die Lehrkräfte auf ein falsches Notenportal.",
@@ -859,6 +892,7 @@ function report(){
     <table><tr><th>Mission</th><th>Stand</th><th>Fehlversuche</th><th>Hilfen</th><th>Punkte</th></tr>${rows}
     <tr><td>Java Expertenlabor</td><td>${S.java.e?"✓":"–"}</td><td></td><td></td><td><b>${S.java.e?4:0}</b></td></tr>
     <tr><td>Expertenspur</td><td>${S.extra?"✓":"–"}</td><td></td><td></td><td><b>${S.extra?2:0}</b></td></tr>
+    <tr><td>Transfer: Vigenère in Java</td><td>${S.transfer?"✓":"–"}</td><td></td><td></td><td><b>${S.transfer?6:0}</b></td></tr>
     <tr><td>Abschlussquiz</td><td>${S.quizDone?"✓":"–"}</td><td></td><td></td><td><b>${S.quizDone?S.quizPts:0}</b></td></tr>
     <tr><td colspan="4"><b>Gesamt</b></td><td><b style="font-size:20px">${totalPts()} / ${MAXPTS}</b></td></tr></table>
     <p style="margin-bottom:2px"><b>Stand-Code</b></p><div class="bigcode">${makeCode(S)}</div>
@@ -881,11 +915,11 @@ function teacherPanel(){
   const draw = () => {
     const L = tload();
     if(!L.length){ p.querySelector(".tt").innerHTML = `<p class="small" style="color:#7f9a97">Noch keine Teams eingetragen.</p>`; return; }
-    const head = `<tr><th>Team</th>${M.map(m=>`<th title="${m.name}">M${m.n}</th>`).join("")}<th>Java E</th><th>Quiz</th><th>Gesamt</th><th>Stand vom</th><th></th></tr>`;
+    const head = `<tr><th>Team</th>${M.map(m=>`<th title="${m.name}">M${m.n}</th>`).join("")}<th>Java E</th><th>Vigenère</th><th>Quiz</th><th>Gesamt</th><th>Stand vom</th><th></th></tr>`;
     const body = L.map((e,ix) => { const st = readCode(e.team, e.code); if(!st) return ""; const old = S; S = st;
       const cells = M.map(m => { const k = (st.steps[m.n]||[]).filter(Boolean).length; const done = missionDone(m.n);
         return `<td title="${st.fails[m.n]} Fehlversuche, ${st.hints[m.n]} Hilfen">${done?`<b style="color:#8fe3a8">${missionPts(m.n)}</b>`:k?`<span style="color:var(--amber)">${k}/${NSTEPS[m.n-1]}</span>`:"–"}<br><span style="font-size:11px;color:#7f9a97">F${st.fails[m.n]} H${st.hints[m.n]}</span></td>`; }).join("");
-      const row = `<tr><td>${esc(e.team)}</td>${cells}<td>${st.java.e?"✓":"–"}</td><td>${st.quizDone?st.quizPts:"–"}</td><td><b>${totalPts()}</b></td><td style="font-size:12px">${e.t}</td><td><button class="btn ghost small del" data-i="${ix}">✕</button></td></tr>`;
+      const row = `<tr><td>${esc(e.team)}</td>${cells}<td>${st.java.e?"✓":"–"}</td><td>${st.transfer?"✓":"–"}</td><td>${st.quizDone?st.quizPts:"–"}</td><td><b>${totalPts()}</b></td><td style="font-size:12px">${e.t}</td><td><button class="btn ghost small del" data-i="${ix}">✕</button></td></tr>`;
       S = old; return row; }).join("");
     p.querySelector(".tt").innerHTML = `<table>${head}${body}</table><p class="small" style="color:#7f9a97">M1 bis M6: Punkte der gelösten Mission (grün) oder gelöste Schritte (gelb). F = Fehlversuche, H = genutzte Hilfen.</p>`;
     p.querySelectorAll(".del").forEach(b => b.onclick = () => { const L = tload(); L.splice(+b.dataset.i,1); tsave(L); draw(); });
@@ -897,10 +931,10 @@ function teacherPanel(){
     L.sort((a,b) => a.team.localeCompare(b.team)); tsave(L); msg.textContent = "✓ eingetragen"; msg.style.color = "#8fe3a8"; p.querySelector(".tn").value = ""; p.querySelector(".tc").value = ""; draw();
   };
   p.querySelector(".csv").onclick = () => {
-    const L = tload(); let csv = "Team;" + M.map(m=>`M${m.n} Punkte;M${m.n} Schritte;M${m.n} Fehlversuche;M${m.n} Hilfen`).join(";") + ";Java Experte;Expertenspur;Quiz;Gesamt;Code;Stand vom\n";
+    const L = tload(); let csv = "Team;" + M.map(m=>`M${m.n} Punkte;M${m.n} Schritte;M${m.n} Fehlversuche;M${m.n} Hilfen`).join(";") + ";Java Experte;Expertenspur;Vigenere Transfer;Quiz;Gesamt;Code;Stand vom\n";
     const old = S;
     L.forEach(e => { const st = readCode(e.team, e.code); if(!st) return; S = st;
-      csv += `${e.team};` + M.map(m => `${missionPts(m.n)};${(st.steps[m.n]||[]).filter(Boolean).length};${st.fails[m.n]};${st.hints[m.n]}`).join(";") + `;${st.java.e?1:0};${st.extra?1:0};${st.quizDone?st.quizPts:""};${totalPts()};${e.code};${e.t}\n`; });
+      csv += `${e.team};` + M.map(m => `${missionPts(m.n)};${(st.steps[m.n]||[]).filter(Boolean).length};${st.fails[m.n]};${st.hints[m.n]}`).join(";") + `;${st.java.e?1:0};${st.extra?1:0};${st.transfer?1:0};${st.quizDone?st.quizPts:""};${totalPts()};${e.code};${e.t}\n`; });
     S = old;
     const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"})); a.download = "spioncamp_klassenuebersicht.csv"; a.click();
   };
