@@ -6,10 +6,10 @@ Fortsetzung des Lernspiels „Störfall im Schulnetz“ (https://nb-gsn.github.i
 
 1. Die abgefangene Nachricht: Fachbegriffe, Caesar von Hand, Kerckhoffs
 2. Das Java-Labor: Caesar in BlueJ programmieren (Basis, Standard, Experte)
-3. Angriff auf Caesar: Brute Force, Häufigkeitsanalyse, Vigenère
+3. Angriff auf Caesar: Brute Force, Häufigkeitsanalyse, Vigenère, Schlüsselraum (25, 26ᴸ, 2¹²⁸)
 4. Das Schlüsselproblem: Schlüsselaustausch, n(n−1)/2, Farbmisch-Experiment
-5. Echt oder gefälscht? Schlüsselpaar, Signatur, Man-in-the-Middle, Zertifikate
-6. Finale: Angriff rekonstruieren, Täter überführen, Sicherheitskonzept, Abschlussquiz
+5. Echt oder gefälscht? Schlüsselpaar, Hashwert und Signatur (Live-Demo), Schutzziele, Man-in-the-Middle, Zertifikate
+6. Finale: Angriff rekonstruieren, Täter überführen, Sicherheitskonzept, Schutzziele zuordnen, hybride Verfahren, Abschlussquiz
 
 **BlueJ-Projekt:** `SpionCamp_Caesar.zip` (in BlueJ über Projekt → ZIP/JAR öffnen). Klassen: `Caesar` (Lückentext L1–L12), `Beweismittel` (abgefangene Nachrichten), `Pruefstand` (Selbsttest je Stufe).
 
@@ -21,5 +21,6 @@ Fortsetzung des Lernspiels „Störfall im Schulnetz“ (https://nb-gsn.github.i
 - Java-Labor als Lückentext (L1 bis L12) mit gestuften Hilfen auf der Seite. Im BlueJ-Projekt stehen an denselben Stellen kompilierbare Platzhalter.
 - Transferaufgabe nach Mission 4: Klasse `Vigenere` ohne Lücken selbst schreiben (5 gestufte Hilfen auf der Seite, Test `pruefeVigenere()`), +6 Punkte.
 - Mission 6: Abschlussbericht an die Schulleitung als Klausurtraining auf Papier (30 min, 20 Punkte, Operatoren wie im Abitur).
+- Abi-Spickzettel Kryptografie (`Abi-Spickzettel_Kryptografie.pdf`): eine Seite mit allen Fachbegriffen, Schutzzielen und Schlüsseltabelle, wird nach Mission 6 im Team ausgefüllt.
 - Quiz: 10 Fragen, bis zu 20 Punkte. Camp gesamt: 92 Punkte.
 - QR-Code: `qr-plakat.png` (Beamer/Aushang, mit Geheimbotschaft in Caesar k = 3) und `qr-code.png`.

@@ -494,7 +494,7 @@ const M = [
  {n:3, name:"Angriff auf Caesar", topic:"Brute Force · Häufigkeitsanalyse · Vigenère",
   story:`Am Samstag schicken die Täter eine lange Nachricht, und diesmal gibt es keinen Notizzettel. Der Schlüssel ist unbekannt. Zeit für einen echten Angriff. Ihr knackt Caesar auf zwei Arten und vergleicht sie.`,
   evidence:`<span class="sys">[Chatprotokoll] Sa 20:14  über Schulserver:</span>\n<span class="hot">${N3}</span>`,
-  heft:"Ins Heft: Brute Force und Häufigkeitsanalyse kurz erklären und vergleichen. Warum hilft die Häufigkeitsanalyse bei Vigenère kaum? (AB 4, Aufgaben 2, 3 und 6)",
+  heft:"Ins Heft: Brute Force und Häufigkeitsanalyse erklären und vergleichen. Mono- und polyalphabetisch unterscheiden. Schlüsselraum von Caesar, Vigenère (26 hoch L) und AES (2 hoch 128) mit Brute-Force-Dauer. Warum ein großer Schlüsselraum allein nicht reicht (AB 4, Aufgaben 2, 3 und 6).",
   clue:"Die Täter wechseln auf das Vigenère-Verfahren. Den Schlüssel schicken sie sich per Mail.",
   steps:[
    {t:"Brute Force: alle Schlüssel ausprobieren", r(el, ok, solved){
@@ -529,28 +529,77 @@ const M = [
       }
       if(solved || S.ui.m3b) more();
    }},
-   {t:"Was planen die Täter?", r(el, ok, solved){
+   {t:"Neuer Plan der Täter: Vigenère", r(el, ok, solved){
       el.append($(`<p>Mit k = 11 lautet die Nachricht:</p><div class="evidence">${caesar(N3,-11)}</div>`));
+      const rest = $(`<div></div>`);
       mc(el, 3, "Was ändern die Täter jetzt?", [
         ["Sie wechseln auf Vigenère und schicken sich den Schlüssel per Mail.", true, ""],
         ["Sie hören auf zu verschlüsseln.", false, ""],
-        ["Sie nutzen Caesar mit einem größeren Schlüssel.", false, "Bei Caesar gibt es keinen größeren Schlüssel: k = 27 ist dasselbe wie k = 1."]], solved, ok);
-   }},
-   {t:"Vigenère: Caesar mit wechselndem Schlüssel", r(el, ok, solved){
-      el.append($(`<p>Vigenère ist Caesar mit einem <b>Schlüsselwort</b>. Jeder Buchstabe des Schlüsselworts gibt eine eigene Verschiebung an: A = 0, B = 1, C = 2 … Das Wort wird immer wiederholt.</p>
-       <div class="pipe"><div class="box"><b>A N A N A S</b><span>Klartext</span></div><div class="arr">+<br></div><div class="box"><b>K E Y K E Y</b><span>Schlüssel wiederholt</span></div><div class="arr">=<br></div><div class="box" style="border-color:var(--red)"><b>? ? ? ? ? ?</b><span>Geheimtext</span></div></div>
-       <p class="small">K = 10, E = 4, Y = 24. Also: A + 10, N + 4, A + 24, N + 10, A + 4, S + 24.</p>`));
-      const rest = $(`<div></div>`);
-      ask(el, 3, "Wie lautet ANANAS mit dem Schlüssel KEY verschlüsselt?", a => norm(a)==="KRYXEQ", solved || S.ui.m3d, () => { S.ui.m3d = true; save(); more(); }, "Geheimtext");
-      hints(el, 3, "m3s4", ["A + 10 = K, N + 4 = R. Weiter geht es mit A + 24.","Bei A + 24 landet ihr bei Y. N + 10 = X."]);
+        ["Sie nutzen Caesar mit einem größeren Schlüssel.", false, "Bei Caesar gibt es keinen größeren Schlüssel: k = 27 ist dasselbe wie k = 1."]], solved || S.ui.m3c, () => { S.ui.m3c = true; save(); vig(); });
       el.append(rest);
-      function more(){
-      mc(rest, 3, "Schaut auf euer Ergebnis: Das A wurde einmal zu K und einmal zu Y. Was bedeutet das für die Häufigkeitsanalyse?", [
-        ["Sie klappt nicht mehr so einfach, weil derselbe Buchstabe zu verschiedenen Buchstaben wird.", true, "Genau. Das Muster der Häufigkeiten wird verwischt."],
-        ["Sie wird einfacher, weil der Geheimtext länger ist.", false, "Der Geheimtext ist genauso lang wie der Klartext."],
-        ["Nichts, sie funktioniert genauso wie bei Caesar.", false, "Bei Caesar wird jedes A immer zum selben Buchstaben. Bei Vigenère nicht."]], solved, ok);
+      function vig(){
+        rest.append($(`<div><p style="margin-top:16px">Vigenère ist Caesar mit einem <b>Schlüsselwort</b>. Jeder Buchstabe des Schlüsselworts gibt eine eigene Verschiebung an: A = 0, B = 1, C = 2 … Das Wort wird immer wiederholt.</p>
+         <div class="pipe"><div class="box"><b>A N A N A S</b><span>Klartext</span></div><div class="arr">+<br></div><div class="box"><b>K E Y K E Y</b><span>Schlüssel wiederholt</span></div><div class="arr">=<br></div><div class="box" style="border-color:var(--red)"><b>? ? ? ? ? ?</b><span>Geheimtext</span></div></div>
+         <p class="small">K = 10, E = 4, Y = 24. Also: A + 10, N + 4, A + 24, N + 10, A + 4, S + 24.</p></div>`));
+        const r2 = $(`<div></div>`);
+        ask(rest, 3, "Wie lautet ANANAS mit dem Schlüssel KEY verschlüsselt?", a => norm(a)==="KRYXEQ", solved || S.ui.m3d, () => { S.ui.m3d = true; save(); more(); }, "Geheimtext");
+        hints(rest, 3, "m3s4", ["A + 10 = K, N + 4 = R. Weiter geht es mit A + 24.","Bei A + 24 landet ihr bei Y. N + 10 = X."]);
+        rest.append(r2);
+        function more(){
+          mc(r2, 3, "Schaut auf euer Ergebnis: Das A wurde einmal zu K und einmal zu Y. Was bedeutet das für die Häufigkeitsanalyse?", [
+            ["Sie klappt nicht mehr so einfach, weil derselbe Buchstabe zu verschiedenen Buchstaben wird.", true, "Genau. Caesar ist <b>monoalphabetisch</b> (ein Geheimalphabet), Vigenère ist <b>polyalphabetisch</b> (mehrere Geheimalphabete im Wechsel). Das Muster der Häufigkeiten wird verwischt."],
+            ["Sie wird einfacher, weil der Geheimtext länger ist.", false, "Der Geheimtext ist genauso lang wie der Klartext."],
+            ["Nichts, sie funktioniert genauso wie bei Caesar.", false, "Bei Caesar wird jedes A immer zum selben Buchstaben. Bei Vigenère nicht."]], solved, ok);
+        }
+        if(solved || S.ui.m3d) more();
       }
-      if(solved || S.ui.m3d) more();
+      if(solved || S.ui.m3c) vig();
+   }},
+   {t:"Wie sicher ist ein Verfahren? Der Schlüsselraum", r(el, ok, solved){
+      el.append($(`<p>Alle möglichen Schlüssel eines Verfahrens zusammen heißen <b>Schlüsselraum</b>. Bei Brute Force probiert der Angreifer den ganzen Schlüsselraum durch. Bei Caesar sind das 25 Schlüssel. Bei Vigenère kann <b>jeder</b> Buchstabe des Schlüsselworts einer von 26 Buchstaben sein, unabhängig von den anderen.</p>`));
+      const rest = $(`<div></div>`);
+      ask(el, 3, "Wie viele Schlüsselwörter mit 6 Buchstaben gibt es? (Zahl oder Potenz, z. B. 5^3)", a => { const x = a.replace(/[\s.]/g,"").replace(/\*\*|hoch/gi,"^"); return x==="26^6" || x==="308915776"; }, solved || S.ui.m3e, () => { S.ui.m3e = true; save(); calc(); }, "Anzahl");
+      hints(el, 3, "m3s5", ["Mit einem Buchstaben gibt es 26 Schlüsselwörter. Mit zwei Buchstaben: 26 Möglichkeiten für den ersten mal 26 für den zweiten, also 26 · 26 = 26².","Mit 6 Buchstaben: 26 · 26 · 26 · 26 · 26 · 26. Ihr dürft das als Potenz schreiben: 26^6."]);
+      el.append(rest);
+      const sup = (e) => String(e).split("").map(d => "⁰¹²³⁴⁵⁶⁷⁸⁹"[d]).join("");
+      const big = (x) => { if(x < 1e7) return Math.round(x).toLocaleString("de-DE"); const e = Math.floor(Math.log10(x)); return (x/10**e).toFixed(1).replace(".",",") + " · 10" + sup(e); };
+      const dur = (s) => { const Y = 365.25*86400;
+        if(s < 1) return "unter 1 Sekunde";
+        if(s < 120) return Math.round(s) + " Sekunden";
+        if(s < 7200) return Math.round(s/60) + " Minuten";
+        if(s < 172800) return Math.round(s/3600) + " Stunden";
+        if(s < Y) return Math.round(s/86400) + " Tage";
+        return big(s/Y) + " Jahre"; };
+      function calc(){
+        const box = $(`<div class="fb info" style="margin-top:14px"><p style="margin:0 0 8px">Ein normaler PC probiert etwa <b>1 Milliarde Schlüssel pro Sekunde</b>. Schiebt den Regler für die Länge des Vigenère-Schlüsselworts.</p>
+          <div class="row"><span style="white-space:nowrap">Länge: <b class="lv mono"></b></span><input type="range" min="1" max="20" value="6" class="grow" aria-label="Länge des Schlüsselworts"></div><div class="kt" style="overflow-x:auto"></div>
+          <p class="small" style="margin:6px 0 0">Zum Vergleich: Das Universum ist etwa 1,4 · 10¹⁰ Jahre alt.</p></div>`); rest.append(box);
+        const rg = box.querySelector("input"), kt = box.querySelector(".kt");
+        const upd = () => { const L = +rg.value; box.querySelector(".lv").textContent = L;
+          const rows = [["Caesar", "25", 25], [`Vigenère, Schlüsselwort mit ${L} Buchstaben`, `26${sup(L)} ≈ ${big(26**L)}`, 26**L], ["AES mit 128 Bit (modernes symmetrisches Verfahren)", `2¹²⁸ ≈ ${big(2**128)}`, 2**128]];
+          kt.innerHTML = `<table class="mt"><tr><th>Verfahren</th><th>Schlüsselraum</th><th>Brute Force dauert höchstens</th></tr>${rows.map(([v,k,x]) => `<tr><td>${v}</td><td class="mono">${k}</td><td><b>${dur(x/1e9)}</b></td></tr>`).join("")}</table>`; };
+        rg.oninput = upd; upd();
+        const r2 = $(`<div></div>`);
+        mc(rest, 3, "Was zeigt die Tabelle?", [
+          ["Vigenère mit 6 Buchstaben ist in unter einer Sekunde durchprobiert. Erst ein Schlüsselraum wie bei AES ist mit Brute Force nicht zu schaffen.", true, "Genau. Darum nutzt man heute Schlüssel mit 128 Bit oder mehr."],
+          ["Vigenère mit 6 Buchstaben hält Brute Force jahrelang stand.", false, "Schaut in die Tabelle: 26⁶ sind rund 300 Millionen Schlüssel, das dauert etwa 0,3 Sekunden."],
+          ["Auch AES knackt man mit genug Computern in ein paar Tagen.", false, "Selbst eine Milliarde PCs bräuchten noch rund 10¹³ Jahre."]], solved || S.ui.m3f, () => { S.ui.m3f = true; save(); weak(); });
+        rest.append(r2);
+        function weak(){
+          const L4 = N4.replace(/ /g,""), K = "ROUTER";
+          let t = `<table class="mt" style="width:auto"><tr>${K.split("").map(c=>`<th class="mono" style="text-align:center">${c}</th>`).join("")}</tr>`;
+          for(let r=0; r*6 < L4.length; r++) t += `<tr>${[0,1,2,3,4,5].map(c => `<td class="mono" style="text-align:center;font-weight:600;color:var(--red)">${L4[r*6+c]||""}</td>`).join("")}</tr>`;
+          r2.append($(`<div><p style="margin-top:16px">Ein langes Schlüsselwort macht den Schlüsselraum riesig. Trotzdem gibt es eine Abkürzung. Schreibt man die Vigenère-Nachricht vom Samstag in Zeilen zu 6 Buchstaben, steht jede Spalte unter demselben Schlüsselbuchstaben:</p>${t}</table></div>`));
+          mc(r2, 3, "Warum ist Vigenère mit kurzem Schlüsselwort trotz großem Schlüsselraum angreifbar?", [
+            ["Das Schlüsselwort wiederholt sich. Jede Spalte ist ein Caesar-Text, und jeden davon knackt man einzeln mit der Häufigkeitsanalyse.", true, "Genau. Der Angreifer muss nur die Länge des Schlüsselworts herausfinden. Bei langen Texten klappt das gut."],
+            ["Weil Vigenère nur Großbuchstaben verschlüsselt.", false, "Das ließe sich leicht ändern. Das eigentliche Problem ist die Wiederholung."],
+            ["Weil der Schlüsselraum kleiner ist als bei Caesar.", false, "Er ist viel größer: 26 hoch Länge statt 25."]], solved, () => { merk(); ok(); });
+          if(solved) merk();
+          function merk(){ r2.append($(`<div class="fb info pop"><b>Merke:</b> Ein großer Schlüsselraum ist <b>notwendig, aber nicht hinreichend</b>. Ein Verfahren ist erst sicher, wenn es auch keine Abkürzung wie die Häufigkeitsanalyse gibt. Nach dem <b>Prinzip von Kerckhoffs</b> darf die Sicherheit nur von der Geheimhaltung des Schlüssels abhängen, nicht von der des Verfahrens.</div>`)); }
+        }
+        if(solved || S.ui.m3f) weak();
+      }
+      if(solved || S.ui.m3e) calc();
    }}
   ]},
  {n:4, name:"Das Schlüsselproblem", topic:"Vigenère · Schlüsselaustausch · Farbmisch-Experiment",
@@ -630,38 +679,71 @@ const M = [
    }}
   ],
   after(el){ transferCard(el); }},
- {n:5, name:"Echt oder gefälscht?", topic:"Schlüsselpaar · Signatur · Man-in-the-Middle · Zertifikate",
+ {n:5, name:"Echt oder gefälscht?", topic:"Schlüsselpaar · Hash und Signatur · Man-in-the-Middle · Zertifikate",
   story:`Freitag, 15:10 Uhr: Alle Lehrkräfte bekommen zwei Mails, beide angeblich von der Schulleitung. Eine davon führt zum gefälschten Portal. Wer im WLAN SCHULE GAST war, bekam beim Öffnen außerdem eine Zertifikatswarnung, und viele haben sie weggeklickt.<br><br>Prüft Mails und Zertifikate so, wie es ein Computer tut. Dafür braucht ihr ein neues Werkzeug: Schlüsselpaare.`,
   evidence:null,
-  heft:"Ins Heft: Merktabelle „Wer nutzt welchen Schlüssel?“ abschreiben. Man-in-the-Middle-Angriff im WLAN SCHULE GAST als Skizze (AB 5, Aufgaben 2, 3 und 5).",
+  heft:"Ins Heft: Merktabelle „Wer nutzt welchen Schlüssel?“ abschreiben. Ablauf einer digitalen Signatur mit Hashwert als Skizze (Signieren und Prüfen). Die drei Schutzziele mit je einem Beispiel. Man-in-the-Middle-Angriff im WLAN SCHULE GAST als Skizze (AB 5, Aufgaben 2, 3 und 5).",
   clue:"Das gefälschte Portal nutzt ein selbst signiertes Zertifikat. Ausgestellt von: K. Brandt IT-Service.",
   steps:[
    {t:"Das Schlüsselpaar: Schloss und Schlüssel", r(el, ok, solved){
       const lock = (open, col) => `<svg width="56" height="64" viewBox="0 0 56 64"><path d="M14 30 V18 a14 14 0 0 1 28 0 ${open?"V12":"V30"}" fill="none" stroke="#2a2824" stroke-width="6" stroke-linecap="round"/><rect x="6" y="28" width="44" height="32" rx="6" fill="${col}"/><circle cx="28" cy="42" r="5" fill="#f5efe2"/><rect x="26" y="44" width="4" height="9" fill="#f5efe2"/></svg>`;
-      el.append($(`<p>Ben hat viele <b>offene Vorhängeschlösser</b>, die er an alle verteilt. Den einzigen <b>Schlüssel</b> dazu behält er für sich.</p>
+      el.append($(`<div><p>Ben hat viele <b>offene Vorhängeschlösser</b>, die er an alle verteilt. Den einzigen <b>Schlüssel</b> dazu behält er für sich.</p>
         <div class="locks"><div>${lock(true,"#1f7a84")}öffentlicher Schlüssel<br><span class="small">= Bens offenes Schloss, für alle</span></div><div><svg width="64" height="64" viewBox="0 0 64 64"><circle cx="18" cy="32" r="12" fill="none" stroke="#c43a2c" stroke-width="6"/><path d="M30 32 H58 M50 32 v10 M42 32 v8" stroke="#c43a2c" stroke-width="6" stroke-linecap="round"/></svg>privater Schlüssel<br><span class="small">= nur Ben hat ihn</span></div></div>
-        <p>Jeder kann eine Kiste mit Bens Schloss zuschnappen lassen. Öffnen kann sie nur Ben. Das Besondere: Der Schlüssel muss nie verschickt werden.</p>`));
+        <p>Jeder kann eine Kiste mit Bens Schloss zuschnappen lassen. Öffnen kann sie nur Ben. Das Besondere: Der private Schlüssel muss nie verschickt werden. In der Mathematik steckt dahinter eine <b>Einwegfunktion</b>: leicht zu berechnen, aber praktisch nicht umzukehren, wie beim Farbmischen.</p></div>`));
+      const rest = $(`<div></div>`);
       mc(el, 5, "Anna will Ben eine geheime Nachricht schicken. Was benutzt sie?", [
         ["Bens öffentlichen Schlüssel (sein offenes Schloss).", true, "Richtig. Öffnen kann die Kiste nur Ben mit seinem privaten Schlüssel."],
         ["Bens privaten Schlüssel.", false, "Den hat nur Ben. Anna kommt da gar nicht dran."],
-        ["Ihren eigenen öffentlichen Schlüssel.", false, "Dann könnte nur Anna die Kiste wieder öffnen, nicht Ben."]], solved, ok);
+        ["Ihren eigenen öffentlichen Schlüssel.", false, "Dann könnte nur Anna die Kiste wieder öffnen, nicht Ben."]], solved || S.ui.m5a, () => { S.ui.m5a = true; save(); table(); });
+      el.append(rest);
+      function table(){
+        rest.append($(`<p style="margin-top:16px">Bei einer <b>digitalen Signatur</b> ist es genau umgekehrt: Anna „unterschreibt“ mit ihrem privaten Schlüssel, und alle können mit ihrem öffentlichen Schlüssel prüfen, dass die Nachricht wirklich von ihr ist. Füllt die Merktabelle aus.</p>`));
+        const OPT = ["Bens öffentlicher Schlüssel","Bens privater Schlüssel","Annas öffentlicher Schlüssel","Annas privater Schlüssel"];
+        const R = [["Anna verschlüsselt eine Nachricht an Ben mit …","Bens öffentlicher Schlüssel"],["Ben entschlüsselt sie mit …","Bens privater Schlüssel"],["Anna signiert eine Nachricht mit …","Annas privater Schlüssel"],["Ben prüft Annas Signatur mit …","Annas öffentlicher Schlüssel"]];
+        const tb = $(`<table class="mt"><tr><th>Situation</th><th style="width:45%">Schlüssel</th></tr></table>`); rest.append(tb);
+        const sels = R.map(([s,a]) => { const tr = $(`<table><tr><td>${s}</td><td><select><option value="">wählen …</option>${OPT.map(o=>`<option>${o}</option>`).join("")}</select></td></tr></table>`).querySelector("tr"); tb.querySelector("tbody").append(tr); const sel = tr.querySelector("select"); if(solved){ sel.value = a; sel.disabled = true; } return [sel,a]; });
+        const b = $(`<div class="row" style="margin-top:10px"><button class="btn">Prüfen</button></div>`); rest.append(b);
+        hints(rest, 5, "m5s2", ["Verschlüsseln: Es soll nur der Empfänger lesen können. Signieren: Es soll nur der Absender erstellen können.","Wer etwas tut, das nur eine Person kann, braucht deren privaten Schlüssel."]);
+        if(solved){ b.querySelector("button").disabled = true; return; }
+        b.querySelector("button").onclick = () => { if(sels.every(([s,a]) => s.value === a)){ sels.forEach(([s])=>s.disabled=true); b.querySelector("button").disabled = true; ok(); } else { sels.forEach(([s,a]) => s.style.borderColor = s.value===a ? "var(--ok)" : "var(--red)"); fail(5); shakeEl(tb); } };
+      }
+      if(solved || S.ui.m5a) table();
    }},
-   {t:"Merktabelle: Wer nutzt welchen Schlüssel?", r(el, ok, solved){
-      el.append($(`<p>Bei einer <b>digitalen Signatur</b> ist es genau umgekehrt: Anna „unterschreibt“ mit ihrem privaten Schlüssel, und alle können mit ihrem öffentlichen Schlüssel prüfen, dass die Nachricht wirklich von ihr ist. Füllt die Tabelle aus.</p>`));
-      const OPT = ["Bens öffentlicher Schlüssel","Bens privater Schlüssel","Annas öffentlicher Schlüssel","Annas privater Schlüssel"];
-      const R = [["Anna verschlüsselt eine Nachricht an Ben mit …","Bens öffentlicher Schlüssel"],["Ben entschlüsselt sie mit …","Bens privater Schlüssel"],["Anna signiert eine Nachricht mit …","Annas privater Schlüssel"],["Ben prüft Annas Signatur mit …","Annas öffentlicher Schlüssel"]];
-      const tb = $(`<table class="mt"><tr><th>Situation</th><th style="width:45%">Schlüssel</th></tr></table>`); el.append(tb);
-      const sels = R.map(([s,a]) => { const tr = $(`<table><tr><td>${s}</td><td><select><option value="">wählen …</option>${OPT.map(o=>`<option>${o}</option>`).join("")}</select></td></tr></table>`).querySelector("tr"); tb.querySelector("tbody").append(tr); const sel = tr.querySelector("select"); if(solved){ sel.value = a; sel.disabled = true; } return [sel,a]; });
-      const b = $(`<div class="row" style="margin-top:10px"><button class="btn">Prüfen</button></div>`); el.append(b);
-      if(solved){ b.querySelector("button").disabled = true; return; }
-      b.querySelector("button").onclick = () => { if(sels.every(([s,a]) => s.value === a)){ sels.forEach(([s])=>s.disabled=true); b.querySelector("button").disabled = true; ok(); } else { sels.forEach(([s,a]) => s.style.borderColor = s.value===a ? "var(--ok)" : "var(--red)"); fail(5); shakeEl(tb); } };
-      hints(el, 5, "m5s2", ["Verschlüsseln: Es soll nur der Empfänger lesen können. Signieren: Es soll nur der Absender erstellen können.","Wer etwas tut, das nur eine Person kann, braucht deren privaten Schlüssel."]);
+   {t:"Hashwert und Signatur: der digitale Fingerabdruck", r(el, ok, solved){
+      const ORIG = "Liebe Kolleginnen und Kollegen, die Zeugniskonferenzen beginnen am 15.12. um 14 Uhr.";
+      const fp = (t) => { const h = hash(t).toString(16).toUpperCase().padStart(8,"0"); return h.slice(0,4) + " " + h.slice(4); };
+      el.append($(`<p>Eine ganze Mail mit dem privaten Schlüssel zu bearbeiten, wäre zu langsam. Darum signiert man nur ihren <b>Hashwert</b>: einen kurzen „Fingerabdruck“ fester Länge, den ein Programm aus dem Text berechnet. Ändert im Text unten etwas, zum Beispiel das Datum, und beobachtet die Prüfung.</p>`));
+      const demo = $(`<div class="grid2">
+        <div class="mail"><div class="hd">Von: schulleitung@schule-intern.de<br>Betreff: Zeugniskonferenzen</div><textarea rows="4" spellcheck="false" aria-label="Text der Mail"></textarea>
+          <div class="small" style="margin-top:6px">🔏 Signatur: <span class="mono">${fp(ORIG)}</span>, verschlüsselt mit dem <b>privaten</b> Schlüssel der Schulleitung</div></div>
+        <div><p style="margin-top:0"><b>Die Lehrkraft prüft:</b></p>
+          <table class="mt"><tr><td>① Signatur mit dem <b>öffentlichen</b> Schlüssel der Schulleitung entschlüsseln</td><td class="mono"><b>${fp(ORIG)}</b></td></tr>
+          <tr><td>② Hashwert der angekommenen Mail selbst berechnen</td><td class="mono"><b class="now"></b></td></tr></table><div class="res"></div></div></div>`); el.append(demo);
+      const ta = demo.querySelector("textarea"); ta.value = ORIG;
+      const upd = () => { const h = fp(ta.value); demo.querySelector(".now").textContent = h;
+        demo.querySelector(".res").innerHTML = h === fp(ORIG) ? `<div class="fb ok">✓ Beide Werte gleich: Die Mail ist unverändert und stammt von der Schulleitung.</div>` : `<div class="fb err">✗ Die Werte passen nicht: Die Mail wurde unterwegs verändert.</div>`; };
+      ta.oninput = upd; upd();
+      el.append($(`<p class="small">Das Camp rechnet mit einem Spielzeug-Hash aus 32 Bit. Echte Verfahren wie SHA-256 liefern 256 Bit. Eine <b>Hashfunktion</b> ist eine Einwegfunktion: Aus dem Hashwert kann man den Text nicht zurückrechnen, und schon ein geändertes Zeichen ergibt einen völlig anderen Wert.</p>`));
+      const rest = $(`<div></div>`);
+      mc(el, 5, "Ein Angreifer ändert in der signierten Mail nur das Datum. Warum fällt das auf?", [
+        ["Der selbst berechnete Hashwert passt nicht mehr zum Hashwert aus der Signatur.", true, ""],
+        ["Die Mail lässt sich nicht mehr öffnen.", false, "Lesen kann man sie weiterhin. Nur die Prüfung schlägt fehl."],
+        ["Gar nicht, solange er die alte Signatur mitschickt.", false, "Die alte Signatur passt nur zum alten Text. Eine neue kann er ohne den privaten Schlüssel der Schulleitung nicht erstellen."]], solved || S.ui.m5b, () => { S.ui.m5b = true; save(); more(); });
+      el.append(rest);
+      function more(){
+        rest.append($(`<p style="margin-top:16px">Für Sicherheit gibt es drei Fachbegriffe, die <b>Schutzziele</b>. <b>Vertraulichkeit:</b> Nur Befugte können die Nachricht lesen. <b>Integrität:</b> Die Nachricht wurde nicht verändert. <b>Authentizität:</b> Die Nachricht stammt wirklich vom angegebenen Absender.</p>`));
+        mc(rest, 5, "Welche Schutzziele sichert eine digitale Signatur?", [
+          ["Integrität und Authentizität", true, "Genau. Der Hashwert zeigt jede Änderung (Integrität), und nur der Besitzer des privaten Schlüssels kann die Signatur erstellen (Authentizität)."],
+          ["Vertraulichkeit und Integrität", false, "Eine signierte Mail ist nicht verschlüsselt. Jeder kann sie lesen. Für Vertraulichkeit muss man zusätzlich verschlüsseln."],
+          ["nur Vertraulichkeit", false, "Signieren heißt nicht verschlüsseln. Die Mail bleibt lesbar."]], solved, ok);
+      }
+      if(solved || S.ui.m5b) more();
    }},
    {t:"Die Mails prüfen", r(el, ok, solved){
       el.append($(`<div class="grid2">
         <div class="mail"><div class="hd">Von: schulleitung@schule-intern.de · Fr 15:10<br>Betreff: Termine Dezember</div>Liebe Kolleginnen und Kollegen, anbei die Termine für Dezember. Die Zeugniskonferenzen beginnen am 15.12.<br><span class="small">🔏 digital signiert</span><div class="o1"></div></div>
         <div class="mail"><div class="hd">Von: schulleitung@schule-intern.de · Fr 15:12<br>Betreff: DRINGEND: neues Notenportal</div>Liebe Kolleginnen und Kollegen, wegen der Störung muss jede Lehrkraft ihr Passwort im neuen Portal bestätigen: notenportal-schule-intern.de<br><span class="small">🔏 digital signiert</span><div class="o2"></div></div></div>`));
-      const showRes = () => { el.querySelector(".o1").innerHTML = `<div class="fb ok">✓ Signatur gültig: von der Schulleitung, unverändert.</div>`; el.querySelector(".o2").innerHTML = `<div class="fb err">✗ Signatur ungültig: nicht mit dem privaten Schlüssel der Schulleitung erstellt. Fälschung!</div>`; };
+      const showRes = () => { el.querySelector(".o1").innerHTML = `<div class="fb ok">✓ Signatur gültig: Die Hashwerte stimmen überein. Von der Schulleitung, unverändert.</div>`; el.querySelector(".o2").innerHTML = `<div class="fb err">✗ Signatur ungültig: Mit dem öffentlichen Schlüssel der Schulleitung ergibt sie nicht den Hashwert dieser Mail. Fälschung!</div>`; };
       if(solved) showRes();
       mc(el, 5, "Mit welchem Schlüssel prüft ihr die Signaturen?", [
         ["mit dem öffentlichen Schlüssel der Schulleitung", true, ""],
@@ -686,7 +768,7 @@ const M = [
  {n:6, name:"Finale: Wer war es?", topic:"Angriff rekonstruieren · Täter · HTTPS · Sicherheitskonzept",
   story:`Alle Spuren liegen auf dem Tisch. Jetzt rekonstruiert ihr den Angriff, überführt den Täter und entwickelt für die Schulleitung ein Sicherheitskonzept: <b>Wie macht die Schule es künftig besser?</b>`,
   evidence:`<span class="sys">[Besucherliste Sekretariat] Freitag</span>\n 9:00-12:00  Fortbildung: Referentin Dr. S. Lenz (Lehrerzimmer)\n10:15-11:00  PrintPro, Wartung Kopierer (Raum 104)\n<span class="hot">14:30-15:20  K. Brandt IT-Service, "Abholung Altgeräte" (Lehrerzimmer)</span>\n<span class="sys">Hinweis Schulträger: Vertrag mit K. Brandt IT-Service endete im Juli. Keine Abholung beauftragt.</span>`,
-  heft:"Abgabe: Sicherheitskonzept für die Schulleitung als Plakat oder im Heft. Zu jeder Maßnahme: Welchen Schritt hätte sie verhindert, welches Verfahren steckt dahinter? (AB 6, Aufgaben 1, 2 und 4)",
+  heft:"Abgabe: Sicherheitskonzept für die Schulleitung als Plakat oder im Heft. Zu jeder Maßnahme: Welchen Schritt hätte sie verhindert, welches Verfahren steckt dahinter, welches Schutzziel sichert sie? Danach füllt ihr den Abi-Spickzettel Kryptografie aus (AB 6, Aufgaben 1, 2 und 4).",
   clue:"Täter überführt: K. Brandt IT-Service, der ehemalige externe Dienstleister der Schule.",
   steps:[
    {t:"Den Angriff rekonstruieren", r(el, ok, solved){
@@ -719,20 +801,40 @@ const M = [
         if(r === ATTACK.length){ sels.forEach(s=>s.disabled=true); b.querySelector("button").disabled = true; ok(); } else { fail(6); shakeEl(tb); } };
       hints(el, 6, "m6s3", ["Die beiden Maßnahmen, die nichts nützen, haben mit Caesar und mit dem Abschalten zu tun.","Signaturen helfen gegen gefälschte Mails, Zertifikate gegen gefälschte Seiten."]);
    }},
-   {t:"Das Schloss im Browser: hybride Verschlüsselung", r(el, ok, solved){
-      el.append($(`<p>Das echte Notenportal nutzt HTTPS. Dabei arbeiten beide Verfahren zusammen: Mit dem <b>asymmetrischen</b> Verfahren (Zertifikat, öffentlicher Schlüssel) wird sicher ein gemeinsamer <b>Sitzungsschlüssel</b> vereinbart. Damit werden dann alle Daten <b>symmetrisch</b> verschlüsselt.</p>`));
-      const rest = $(`<div></div>`);
-      mc(el, 6, "Warum macht man das so umständlich?", [
-        ["Asymmetrische Verfahren lösen das Schlüsselproblem, sind aber langsam. Symmetrische Verfahren sind schnell. Hybrid verbindet beide Vorteile.", true, ""],
-        ["Weil symmetrische Verfahren unsicher sind.", false, "Moderne symmetrische Verfahren wie AES sind sehr sicher. Ihr Problem ist nur der Schlüsselaustausch."],
-        ["Weil man so kein Zertifikat braucht.", false, "Gerade das Zertifikat schützt vor dem Man-in-the-Middle."]], solved || S.ui.m6d, () => { S.ui.m6d = true; save(); more(); });
-      el.append(rest);
-      function more(){ mc(rest, 6, "Die Schulleitung schreibt im Messenger mit Ende-zu-Ende-Verschlüsselung. Was bedeutet das?", [
-        ["Auch der Server des Messenger-Anbieters kann die Nachrichten nicht lesen, nur Absender und Empfänger.", true, "Bei reiner Transportverschlüsselung (z. B. HTTPS zum Server) könnte der Server mitlesen."],
-        ["Nur der Weg bis zum Server ist verschlüsselt.", false, "Das ist Transportverschlüsselung."],
-        ["Die Nachrichten werden gar nicht gespeichert.", false, "Damit hat Verschlüsselung nichts zu tun."]], solved, ok); }
-      if(solved || S.ui.m6d) more();
+   {t:"Schutzziele und das Schloss im Browser", r(el, ok, solved){
+      el.append($(`<p>Für den Bericht an die Schulleitung ordnet ihr jede Maßnahme dem <b>Schutzziel</b> zu, das sie sichert.</p>`));
+      const SZ = ["Vertraulichkeit","Integrität","Authentizität"];
+      const R = [["HTTPS verschlüsselt die Verbindung zum Notenportal. Im WLAN kann niemand die Passwörter mitlesen.","Vertraulichkeit"],
+                 ["Der Hashwert in der Signatur zeigt: Die Mail der Schulleitung wurde unterwegs nicht verändert.","Integrität"],
+                 ["Das Zertifikat einer Zertifizierungsstelle bestätigt: Der öffentliche Schlüssel gehört wirklich zum Notenportal.","Authentizität"],
+                 ["Nachts vergleicht ein Programm die Hashwerte der Notendateien mit gespeicherten Werten.","Integrität"],
+                 ["Die Signatur kann nur mit dem privaten Schlüssel der Schulleitung erstellt werden.","Authentizität"]];
+      const tb = $(`<table class="mt"><tr><th>Maßnahme</th><th style="width:34%">Schutzziel</th></tr></table>`); el.append(tb);
+      const sels = R.map(([s,a]) => { const tr = $(`<table><tr><td>${s}</td><td><select><option value="">wählen …</option>${SZ.map(o=>`<option>${o}</option>`).join("")}</select></td></tr></table>`).querySelector("tr"); tb.querySelector("tbody").append(tr); const sel = tr.querySelector("select"); if(solved || S.ui.m6s){ sel.value = a; sel.disabled = true; } return [sel,a]; });
+      const b = $(`<div class="row" style="margin-top:10px"><button class="btn">Prüfen</button><span class="small res"></span></div>`); el.append(b);
+      hints(el, 6, "m6s4", ["Vertraulichkeit: Wer kann mitlesen? Integrität: Wurde etwas verändert? Authentizität: Wer ist der Absender oder Inhaber?"]);
+      const rest = $(`<div></div>`); el.append(rest);
+      if(solved || S.ui.m6s) b.querySelector("button").disabled = true;
+      else b.querySelector("button").onclick = () => { if(sels.some(([s]) => !s.value)){ b.querySelector(".res").textContent = "Bitte zuerst jede Zeile ausfüllen."; return; } let r = 0; sels.forEach(([s,a]) => { const g = s.value === a; if(g) r++; s.style.borderColor = g ? "var(--ok)" : "var(--red)"; });
+        b.querySelector(".res").textContent = `${r} von ${R.length} richtig`;
+        if(r === R.length){ sels.forEach(([s])=>s.disabled=true); b.querySelector("button").disabled = true; S.ui.m6s = true; save(); hybrid(); } else { fail(6); shakeEl(tb); } };
+      function hybrid(){
+        rest.append($(`<p style="margin-top:16px">Das echte Notenportal nutzt HTTPS. Dabei arbeiten beide Verfahren zusammen: Mit dem <b>asymmetrischen</b> Verfahren (Zertifikat, öffentlicher Schlüssel) wird sicher ein gemeinsamer <b>Sitzungsschlüssel</b> vereinbart. Damit werden dann alle Daten <b>symmetrisch</b> verschlüsselt.</p>`));
+        const r2 = $(`<div></div>`);
+        mc(rest, 6, "Warum macht man das so umständlich?", [
+          ["Asymmetrische Verfahren lösen das Schlüsselproblem, sind aber langsam. Symmetrische Verfahren sind schnell. Hybrid verbindet beide Vorteile.", true, ""],
+          ["Weil symmetrische Verfahren unsicher sind.", false, "Moderne symmetrische Verfahren wie AES sind sehr sicher. Ihr Problem ist nur der Schlüsselaustausch."],
+          ["Weil man so kein Zertifikat braucht.", false, "Gerade das Zertifikat schützt vor dem Man-in-the-Middle."]], solved || S.ui.m6d, () => { S.ui.m6d = true; save(); more(); });
+        rest.append(r2);
+        function more(){ mc(r2, 6, "Die Schulleitung schreibt im Messenger mit Ende-zu-Ende-Verschlüsselung. Was bedeutet das?", [
+          ["Auch der Server des Messenger-Anbieters kann die Nachrichten nicht lesen, nur Absender und Empfänger.", true, "Bei reiner Transportverschlüsselung (z. B. HTTPS zum Server) könnte der Server mitlesen."],
+          ["Nur der Weg bis zum Server ist verschlüsselt.", false, "Das ist Transportverschlüsselung."],
+          ["Die Nachrichten werden gar nicht gespeichert.", false, "Damit hat Verschlüsselung nichts zu tun."]], solved, ok); }
+        if(solved || S.ui.m6d) more();
+      }
+      if(solved || S.ui.m6s) hybrid();
    }}
+
   ],
   after(el){ examCard(el); const q = $(`<div class="step"><div class="shead"><span class="snum">★</span><span class="stitle">Abschlussquiz für die Rangliste</span></div><div class="qz"></div></div>`); el.append(q); QZ = q.querySelector(".qz"); quiz(QZ); }
  }
@@ -767,7 +869,8 @@ function examCard(el){
      <li><i>Erklären</i> Sie, wie die Täter im WLAN „SCHULE GAST“ als Man-in-the-Middle an die Passwörter gelangt sind. <i>Erläutern</i> Sie, wie ein Zertifikat einer anerkannten Zertifizierungsstelle diesen Angriff verhindert hätte. <b>(5 P.)</b></li>
      <li>Der Schulträger schlägt vor: „Künftig übertragen wir alle Daten zum Notenserver nur noch asymmetrisch verschlüsselt. Das ist am sichersten.“ <i>Beurteilen</i> Sie diesen Vorschlag. <b>(4 P.)</b></li>
      <li><i>Beurteilen</i> Sie, ob die Einführung einer Zwei-Faktor-Anmeldung allein ausgereicht hätte, um den Angriff zu verhindern. <b>(3 P.)</b></li></ol>
-    <p class="small">Tipp: Die Operatoren sind dieselben wie im Abitur. „Beurteilen“ heißt: Argumente für und gegen abwägen und zu einem begründeten Urteil kommen.</p></div>`);
+    <p class="small">Tipp: Die Operatoren sind dieselben wie im Abitur. „Beurteilen“ heißt: Argumente für und gegen abwägen und zu einem begründeten Urteil kommen.</p>
+    <p class="row" style="margin-top:12px"><a class="btn amber small" href="Abi-Spickzettel_Kryptografie.pdf" download>⬇ Abi-Spickzettel Kryptografie (PDF)</a><span class="small">Zum Schluss füllt ihr als Team den Spickzettel aus: alle Fachbegriffe, die drei Schutzziele und wer welchen Schlüssel nutzt.</span></p></div>`);
   el.append(box);
 }
 const ATTACK = ["Die Täter lesen das WLAN-Passwort vom Klebezettel im Lehrerzimmer ab.",
